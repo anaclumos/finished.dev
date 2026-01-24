@@ -35,14 +35,14 @@ Fill in `.env.local` with:
 - `NEXT_PUBLIC_CONVEX_URL` - Auto-populated by `convex dev`
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` - From Clerk dashboard
 - `CLERK_SECRET_KEY` - From Clerk dashboard
-- `CLERK_FRONTEND_API_URL` - Your Clerk Frontend API URL (for Convex auth config)
+- `CLERK_JWT_ISSUER_DOMAIN` - Your Clerk JWT issuer domain (see below)
 
 ## Clerk + Convex Auth Setup
 
 1. Go to [Clerk Dashboard → JWT Templates](https://dashboard.clerk.com/~/jwt-templates)
 2. Create a new template using the **Convex** preset
 3. Keep the template name as `convex`
-4. Copy your Clerk Frontend API URL to `CLERK_FRONTEND_API_URL`
+4. Copy the **Issuer** URL to `CLERK_JWT_ISSUER_DOMAIN` (e.g., `https://your-app.clerk.accounts.dev`)
 
 ## Learn More
 

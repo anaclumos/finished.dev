@@ -2,6 +2,52 @@ import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
 
+export const upsertCurrent = mutation({
+  args: {
+    endpoint: v.string(),
+    p256dh: v.string(),
+    auth: v.string(),
+    userAgent: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .first();
+
+    if (!user) throw new Error("User not found");
+
+    const existing = await ctx.db
+      .query("pushSubscriptions")
+      .withIndex("by_user_endpoint", (q) =>
+        q.eq("userId", user._id).eq("endpoint", args.endpoint),
+      )
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        p256dh: args.p256dh,
+        auth: args.auth,
+        userAgent: args.userAgent,
+        enabled: true,
+      });
+      return existing._id;
+    }
+
+    return ctx.db.insert("pushSubscriptions", {
+      userId: user._id,
+      endpoint: args.endpoint,
+      p256dh: args.p256dh,
+      auth: args.auth,
+      userAgent: args.userAgent,
+      enabled: true,
+    });
+  },
+});
+
 export const getByUserAndEndpoint = query({
   args: {
     userId: v.id("users"),

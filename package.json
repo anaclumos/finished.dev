@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "convex deploy --cmd 'next build'",
+    "build": "convex deploy --cmd 'next build' --yes",
     "start": "next start",
     "lint": "next lint"
   },

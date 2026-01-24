@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import webPush from "web-push";
 
 import { api } from "../../../../../convex/_generated/api";
-import { verifyQstashSignature } from "@/lib/qstash";
 
 export const runtime = "nodejs";
 
@@ -26,20 +25,6 @@ export async function POST(request: Request) {
 
   if (!rawBody) {
     return NextResponse.json({ message: "Invalid payload" }, { status: 400 });
-  }
-
-  const qstashSignature =
-    request.headers.get("x-qstash-signature") ??
-    request.headers.get("upstash-signature");
-
-  if (
-    qstashSignature &&
-    !verifyQstashSignature({ signature: qstashSignature, body: rawBody })
-  ) {
-    return NextResponse.json(
-      { message: "Invalid QStash signature" },
-      { status: 401 },
-    );
   }
 
   webPush.setVapidDetails(

@@ -1,9 +1,23 @@
 /* eslint-disable */
 /**
- * Generated API stub.
- * Run `bunx convex dev` to generate the actual implementation.
+ * Generated `api` utility.
+ *
+ * THIS CODE IS AUTOMATICALLY GENERATED.
+ *
+ * To regenerate, run `npx convex dev`.
+ * @module
  */
-import { anyApi } from "convex/server";
 
+import { anyApi, componentsGeneric } from "convex/server";
+
+/**
+ * A utility for referencing Convex functions in your app's API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = api.myModule.myFunction;
+ * ```
+ */
 export const api = anyApi;
 export const internal = anyApi;
+export const components = componentsGeneric();
