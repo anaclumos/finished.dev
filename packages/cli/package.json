@@ -1,0 +1,14 @@
+{
+  "name": "@finished/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "finished-cli": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

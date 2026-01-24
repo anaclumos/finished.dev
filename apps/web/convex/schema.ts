@@ -12,4 +12,12 @@ export default defineSchema({
   })
     .index('by_userId', ['userId'])
     .index('by_endpoint', ['endpoint']),
+  statusUpdates: defineTable({
+    status: v.string(),
+    message: v.optional(v.string()),
+    createdAt: v.number(),
+    createdBy: v.string(),
+  })
+    .index('by_createdAt', ['createdAt'])
+    .index('by_createdBy', ['createdBy']),
 })
