@@ -1,11 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
+import { ConvexHttpClient } from "convex/browser";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { db } from "@/lib/db";
-import { pushSubscriptions } from "@/lib/db/schema";
+import { api } from "../../../../../convex/_generated/api";
 
 export const runtime = "nodejs";
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 const subscriptionSchema = z.object({
   endpoint: z.string().url(),
@@ -15,9 +17,9 @@ const subscriptionSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const { userId } = auth();
+  const { userId: clerkId } = auth();
 
-  if (!userId) {
+  if (!clerkId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -36,34 +38,25 @@ export async function POST(request: Request) {
   const payload = parsed.data;
 
   try {
-    const existing = await db.query.pushSubscriptions.findFirst({
-      where: (table, { and, eq }) =>
-        and(eq(table.userId, userId), eq(table.endpoint, payload.endpoint)),
-    });
+    const user = await convex.query(api.users.getByClerkId, { clerkId });
 
-    if (existing) {
-      await db
-        .update(pushSubscriptions)
-        .set({
-          p256dh: payload.p256dh,
-          auth: payload.auth,
-          userAgent: payload.userAgent,
-          enabled: true,
-        })
-        .where((table, { eq }) => eq(table.id, existing.id));
-    } else {
-      await db.insert(pushSubscriptions).values({
-        userId,
-        endpoint: payload.endpoint,
-        p256dh: payload.p256dh,
-        auth: payload.auth,
-        userAgent: payload.userAgent,
-        enabled: true,
-      });
+    if (!user) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
+
+    await convex.mutation(api.pushSubscriptions.upsert, {
+      userId: user._id,
+      endpoint: payload.endpoint,
+      p256dh: payload.p256dh,
+      auth: payload.auth,
+      userAgent: payload.userAgent,
+    });
 
     return NextResponse.json({ ok: true });
   } catch {
-    return NextResponse.json({ message: "Failed to store subscription" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to store subscription" },
+      { status: 500 },
+    );
   }
 }

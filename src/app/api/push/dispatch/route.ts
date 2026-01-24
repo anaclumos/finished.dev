@@ -1,21 +1,25 @@
-import { eq } from "drizzle-orm";
+import { ConvexHttpClient } from "convex/browser";
 import { NextResponse } from "next/server";
 import webPush from "web-push";
 
-import { db } from "@/lib/db";
-import { notificationJobs, pushSubscriptions } from "@/lib/db/schema";
+import { api } from "../../../../../convex/_generated/api";
 import { verifyQstashSignature } from "@/lib/qstash";
 
 export const runtime = "nodejs";
 
 const INVALID_SUBSCRIPTION_STATUS_CODES = new Set([404, 410]);
 
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
 export async function POST(request: Request) {
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   const privateKey = process.env.VAPID_PRIVATE_KEY;
 
   if (!publicKey || !privateKey) {
-    return NextResponse.json({ message: "VAPID keys are not configured" }, { status: 500 });
+    return NextResponse.json(
+      { message: "VAPID keys are not configured" },
+      { status: 500 },
+    );
   }
 
   const rawBody = await request.text().catch(() => null);
@@ -25,19 +29,26 @@ export async function POST(request: Request) {
   }
 
   const qstashSignature =
-    request.headers.get("x-qstash-signature") ?? request.headers.get("upstash-signature");
+    request.headers.get("x-qstash-signature") ??
+    request.headers.get("upstash-signature");
 
-  if (qstashSignature && !verifyQstashSignature({ signature: qstashSignature, body: rawBody })) {
-    return NextResponse.json({ message: "Invalid QStash signature" }, { status: 401 });
+  if (
+    qstashSignature &&
+    !verifyQstashSignature({ signature: qstashSignature, body: rawBody })
+  ) {
+    return NextResponse.json(
+      { message: "Invalid QStash signature" },
+      { status: 401 },
+    );
   }
 
-  webPush.setVapidDetails("mailto:notifications@finished.dev", publicKey, privateKey);
+  webPush.setVapidDetails(
+    "mailto:notifications@finished.dev",
+    publicKey,
+    privateKey,
+  );
 
-  const now = new Date();
-  const jobs = await db.query.notificationJobs.findMany({
-    where: (table, { and, eq, lte }) =>
-      and(eq(table.status, "pending"), lte(table.runAt, now)),
-  });
+  const jobs = await convex.query(api.notificationJobs.listPendingDue, {});
 
   let processed = 0;
   let succeeded = 0;
@@ -48,22 +59,18 @@ export async function POST(request: Request) {
     processed += 1;
 
     if (!job.userId) {
-      await db
-        .update(notificationJobs)
-        .set({
-          status: "failed",
-          attempts: job.attempts + 1,
-          lastError: "Missing user id",
-          updatedAt: new Date(),
-        })
-        .where(eq(notificationJobs.id, job.id));
+      await convex.mutation(api.notificationJobs.markFailed, {
+        id: job._id,
+        error: "Missing user id",
+      });
       failed += 1;
       continue;
     }
 
-    const subscriptions = await db.query.pushSubscriptions.findMany({
-      where: (table, { and, eq }) => and(eq(table.userId, job.userId), eq(table.enabled, true)),
-    });
+    const subscriptions = await convex.query(
+      api.pushSubscriptions.listEnabledByUser,
+      { userId: job.userId },
+    );
 
     let hasFailure = false;
     let lastError: string | null = null;
@@ -87,10 +94,9 @@ export async function POST(request: Request) {
             : undefined;
 
         if (statusCode && INVALID_SUBSCRIPTION_STATUS_CODES.has(statusCode)) {
-          await db
-            .update(pushSubscriptions)
-            .set({ enabled: false })
-            .where(eq(pushSubscriptions.id, subscription.id));
+          await convex.mutation(api.pushSubscriptions.disable, {
+            id: subscription._id,
+          });
           disabledSubscriptions += 1;
           continue;
         }
@@ -103,21 +109,14 @@ export async function POST(request: Request) {
       }
     }
 
-    const status = hasFailure ? "failed" : "success";
-
-    await db
-      .update(notificationJobs)
-      .set({
-        status,
-        attempts: job.attempts + 1,
-        lastError: hasFailure ? lastError : null,
-        updatedAt: new Date(),
-      })
-      .where(eq(notificationJobs.id, job.id));
-
     if (hasFailure) {
+      await convex.mutation(api.notificationJobs.markFailed, {
+        id: job._id,
+        error: lastError ?? "Unknown error",
+      });
       failed += 1;
     } else {
+      await convex.mutation(api.notificationJobs.markSuccess, { id: job._id });
       succeeded += 1;
     }
   }

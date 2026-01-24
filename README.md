@@ -1,41 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) project using [Convex](https://convex.dev) for the backend and [Clerk](https://clerk.com) for authentication.
 
 ## Getting Started
 
-### Local Postgres
-
-Start the Postgres container and keep it running while developing:
-
-```bash
-docker compose up -d
-```
-
-Use the local connection string from `.env.example` (copy it to `.env.local`).
-
-First, run the development server:
+Install dependencies:
 
 ```bash
 bun install
+```
+
+Copy environment variables:
+
+```bash
+cp .env.example .env.local
+```
+
+Start Convex development server (this will prompt you to create a project on first run):
+
+```bash
+bunx convex dev
+```
+
+In a separate terminal, run the Next.js development server:
+
+```bash
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Fill in `.env.local` with:
+
+- `NEXT_PUBLIC_CONVEX_URL` - Auto-populated by `convex dev`
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` - From Clerk dashboard
+- `CLERK_SECRET_KEY` - From Clerk dashboard
+- `CLERK_FRONTEND_API_URL` - Your Clerk Frontend API URL (for Convex auth config)
+
+## Clerk + Convex Auth Setup
+
+1. Go to [Clerk Dashboard → JWT Templates](https://dashboard.clerk.com/~/jwt-templates)
+2. Create a new template using the **Convex** preset
+3. Keep the template name as `convex`
+4. Copy your Clerk Frontend API URL to `CLERK_FRONTEND_API_URL`
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Convex Documentation](https://docs.convex.dev)
+- [Clerk Documentation](https://clerk.com/docs)
