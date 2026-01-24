@@ -1,6 +1,7 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { ConvexClerkProvider } from '../providers/convex-clerk-provider'
 
 import appCss from '../styles.css?url'
 
@@ -23,6 +24,10 @@ export const Route = createRootRoute({
         rel: 'stylesheet',
         href: appCss,
       },
+      {
+        rel: 'manifest',
+        href: '/manifest.json',
+      },
     ],
   }),
 
@@ -36,7 +41,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <ConvexClerkProvider>{children}</ConvexClerkProvider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',

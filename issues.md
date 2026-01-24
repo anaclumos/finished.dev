@@ -1,0 +1,11 @@
+## UI Components for Push Notifications
+- Found reusable components in `src/components/ui/`:
+    - `DropdownMenuCheckboxItem` (used for toggles in `component-example.tsx`)
+    - `Card`, `Button`, `Switch` (though `Switch` was found via grep, its file wasn't in glob, likely part of another component or needs to be added if missing from `ui/`)
+    - `AlertDialog` for permission requests.
+- Patterns identified:
+    - State handling: `React.useState` for local UI state in `ComponentExample`.
+    - Convex integration: `ConvexClerkProvider` in `src/routes/__root.tsx`, mutations in `convex/pushSubscriptions.ts`.
+- Recommendations:
+    - Reuse the `DropdownMenuCheckboxItem` pattern for notification settings.
+    - Use `src/lib/push.ts` helper functions alongside Convex mutations.
