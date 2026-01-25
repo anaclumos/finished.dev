@@ -47,7 +47,7 @@ const useCases = [
     icon: LaptopIcon,
     title: 'Long-running AI Tasks',
     description:
-      'know when Claude, GPT, or your local LLM finishes a complex task.',
+      'Know when Claude, GPT, or your local LLM finishes a complex task.',
   },
   {
     icon: CloudIcon,
@@ -136,9 +136,9 @@ function LandingPage() {
             </div>
 
             <h1 className="text-5xl font-semibold tracking-tight text-zinc-900 sm:text-6xl">
-              know when your
+              Know When Your
               <br />
-              <span className="text-amber-500">agents finish</span>
+              <span className="text-amber-500">Agents Finish</span>
             </h1>
 
             <p className="mt-6 text-lg leading-relaxed text-zinc-600">
@@ -194,7 +194,7 @@ function LandingPage() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
-              How it works
+              How It Works
             </h2>
             <p className="mt-4 text-zinc-600">
               Three steps to never miss a finished task again.
@@ -220,7 +220,7 @@ function LandingPage() {
                 2
               </div>
               <h3 className="mt-4 text-lg font-semibold text-zinc-900">
-                Configure once
+                Configure Once
               </h3>
               <p className="mt-2 text-zinc-600">
                 Run init to set your API key. Takes 10 seconds.
@@ -233,7 +233,7 @@ function LandingPage() {
                 3
               </div>
               <h3 className="mt-4 text-lg font-semibold text-zinc-900">
-                Ping when done
+                Ping When Done
               </h3>
               <p className="mt-2 text-zinc-600">
                 Add to any script or run manually. Get notified instantly.
@@ -249,7 +249,7 @@ function LandingPage() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
-              Simple, powerful, reliable
+              Simple, Powerful, Reliable
             </h2>
             <p className="mt-4 text-zinc-600">
               Everything you need to stay on top of your async work.
@@ -281,7 +281,7 @@ function LandingPage() {
           <div className="grid items-center gap-16 lg:grid-cols-2">
             <div>
               <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
-                Perfect for
+                Perfect For
               </h2>
               <p className="mt-4 text-lg text-zinc-600">
                 Anyone who runs async tasks and wants to know when they&apos;re
@@ -397,7 +397,7 @@ function LandingPage() {
       <section className="border-t border-zinc-100 bg-zinc-900 py-24">
         <div className="mx-auto max-w-7xl px-6 text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-white">
-            Stop watching terminals
+            Stop Watching Terminals
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
             Let your agents notify you. to start, no credit card

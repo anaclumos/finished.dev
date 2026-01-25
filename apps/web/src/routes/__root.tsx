@@ -1,6 +1,7 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { Analytics } from '@vercel/analytics/react'
 import { ConvexClerkProvider } from '../providers/convex-clerk-provider'
 
 import appCss from '../styles.css?url'
@@ -76,6 +77,10 @@ export const Route = createRootRoute({
         rel: 'manifest',
         href: '/manifest.json',
       },
+      {
+        rel: 'apple-touch-icon',
+        href: '/apple-touch-icon.png',
+      },
     ],
   }),
 
@@ -90,6 +95,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ConvexClerkProvider>{children}</ConvexClerkProvider>
+        <Analytics />
         <TanStackDevtools
           config={{
             position: 'bottom-right',
