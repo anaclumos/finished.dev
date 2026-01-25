@@ -7,6 +7,8 @@ import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
+const isVercel = process.env.VERCEL === '1'
+
 const config = defineConfig({
   resolve: {
     alias: {
@@ -15,7 +17,11 @@ const config = defineConfig({
   },
   plugins: [
     devtools(),
-    nitro(),
+    nitro({
+      // Use Vercel preset when deploying to Vercel, node-server locally
+      preset: isVercel ? 'vercel' : 'node-server',
+      compatibilityDate: 'latest',
+    }),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],

@@ -1,6 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "turbo run build --filter=@finished/web",
+  "framework": "tanstack-start",
+  "installCommand": "bun install",
+  "buildCommand": "npx convex deploy --cmd 'turbo run build --filter=@finished/web'",
   "outputDirectory": "apps/web/.vercel/output",
-  "framework": null
+  "regions": ["iad1"]
 }
