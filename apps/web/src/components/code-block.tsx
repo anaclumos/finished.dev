@@ -5,6 +5,9 @@ interface CodeBlockProps {
   title?: string
 }
 
+const sharedHighlightStyles =
+  '[&_.sh-class]:text-yellow-300 [&_.sh-comment]:text-zinc-500 [&_.sh-identifier]:text-zinc-300 [&_.sh-keyword]:text-purple-400 [&_.sh-property]:text-blue-400 [&_.sh-sign]:text-zinc-400 [&_.sh-string]:text-green-400'
+
 export function CodeBlock({ code, title = 'Terminal' }: CodeBlockProps) {
   const html = highlight(code)
 
@@ -16,10 +19,28 @@ export function CodeBlock({ code, title = 'Terminal' }: CodeBlockProps) {
         <div className="h-3 w-3 rounded-full bg-green-500" />
         <span className="ml-2 text-xs text-zinc-500">{title}</span>
       </div>
-      <pre className="p-4 text-left font-mono text-sm text-zinc-300 [&_.sh-class]:text-yellow-300 [&_.sh-comment]:text-zinc-500 [&_.sh-identifier]:text-zinc-300 [&_.sh-keyword]:text-purple-400 [&_.sh-property]:text-blue-400 [&_.sh-sign]:text-zinc-400 [&_.sh-string]:text-green-400">
+      <pre
+        className={`p-4 text-left font-mono text-sm text-zinc-300 ${sharedHighlightStyles}`}
+      >
         {/* eslint-disable-next-line react/no-danger -- sugar-high output is sanitized */}
         <code dangerouslySetInnerHTML={{ __html: html }} />
       </pre>
     </div>
+  )
+}
+
+interface InlineCodeProps {
+  children: string
+}
+
+export function InlineCode({ children }: InlineCodeProps) {
+  const html = highlight(children)
+
+  return (
+    <code
+      className={`mt-4 block rounded bg-zinc-900 px-3 py-2 font-mono text-sm text-zinc-300 ${sharedHighlightStyles}`}
+      // eslint-disable-next-line react/no-danger -- sugar-high output is sanitized
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
   )
 }

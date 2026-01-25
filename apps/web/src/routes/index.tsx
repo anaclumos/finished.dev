@@ -6,7 +6,7 @@ import {
   ClerkLoaded,
 } from '@clerk/clerk-react'
 import { Button } from '@/components/ui/button'
-import { CodeBlock } from '@/components/code-block'
+import { CodeBlock, InlineCode } from '@/components/code-block'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   ArrowRight01Icon,
@@ -138,7 +138,7 @@ function LandingPage() {
             <h1 className="text-5xl font-semibold tracking-tight text-zinc-900 sm:text-6xl">
               Know when your
               <br />
-              <span className="text-zinc-400">AI agents finish</span>
+              <span className="text-amber-400">AI agents finish</span>
             </h1>
 
             <p className="mt-6 text-lg leading-relaxed text-zinc-600">
@@ -212,9 +212,7 @@ function LandingPage() {
               <p className="mt-2 text-zinc-600">
                 One command to install. Works with Bun, npm, or run directly.
               </p>
-              <code className="mt-4 block rounded bg-zinc-100 px-3 py-2 font-mono text-sm">
-                bun install -g @finished/cli
-              </code>
+              <InlineCode>bun install -g @finished/cli</InlineCode>
             </div>
 
             <div className="relative rounded-2xl border border-zinc-200 bg-white p-8">
@@ -227,9 +225,7 @@ function LandingPage() {
               <p className="mt-2 text-zinc-600">
                 Run init to set your API key. Takes 10 seconds.
               </p>
-              <code className="mt-4 block rounded bg-zinc-100 px-3 py-2 font-mono text-sm">
-                finished init
-              </code>
+              <InlineCode>finished init</InlineCode>
             </div>
 
             <div className="relative rounded-2xl border border-zinc-200 bg-white p-8">
@@ -242,9 +238,7 @@ function LandingPage() {
               <p className="mt-2 text-zinc-600">
                 Add to any script or run manually. Get notified instantly.
               </p>
-              <code className="mt-4 block rounded bg-zinc-100 px-3 py-2 font-mono text-sm">
-                finished ping "Task done!"
-              </code>
+              <InlineCode>finished ping "Task done!"</InlineCode>
             </div>
           </div>
         </div>
@@ -336,8 +330,12 @@ function LandingPage() {
 
             <div className="relative">
               <div className="rounded-2xl border border-zinc-200 bg-white p-6">
-                <div className="mb-4 text-sm font-medium text-zinc-500">
-                  Example: Claude Agent Workflow
+                <div className="mb-4 flex items-center gap-2 text-sm font-medium text-zinc-500">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+                  </span>
+                  Live Notifications
                 </div>
                 <div className="space-y-3 font-mono text-sm">
                   <div className="flex items-center gap-2 text-zinc-600">
@@ -346,10 +344,11 @@ function LandingPage() {
                       size={16}
                       className="text-green-500"
                     />
-                    <span>Code review completed</span>
-                    <span className="ml-auto text-xs text-zinc-400">
-                      2m ago
+                    <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500">
+                      claude
                     </span>
+                    <span>Refactored auth module</span>
+                    <span className="ml-auto text-xs text-zinc-400">now</span>
                   </div>
                   <div className="flex items-center gap-2 text-zinc-600">
                     <HugeiconsIcon
@@ -357,10 +356,11 @@ function LandingPage() {
                       size={16}
                       className="text-green-500"
                     />
-                    <span>Tests generated</span>
-                    <span className="ml-auto text-xs text-zinc-400">
-                      5m ago
+                    <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500">
+                      cursor
                     </span>
+                    <span>Fixed 12 TypeScript errors</span>
+                    <span className="ml-auto text-xs text-zinc-400">2m</span>
                   </div>
                   <div className="flex items-center gap-2 text-zinc-600">
                     <HugeiconsIcon
@@ -368,10 +368,11 @@ function LandingPage() {
                       size={16}
                       className="text-green-500"
                     />
-                    <span>Documentation updated</span>
-                    <span className="ml-auto text-xs text-zinc-400">
-                      8m ago
+                    <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500">
+                      opencode
                     </span>
+                    <span>PR #847 merged to main</span>
+                    <span className="ml-auto text-xs text-zinc-400">5m</span>
                   </div>
                   <div className="flex items-center gap-2 text-zinc-600">
                     <HugeiconsIcon
@@ -379,10 +380,11 @@ function LandingPage() {
                       size={16}
                       className="text-green-500"
                     />
-                    <span>PR created</span>
-                    <span className="ml-auto text-xs text-zinc-400">
-                      12m ago
+                    <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500">
+                      cli
                     </span>
+                    <span>Deploy to production complete</span>
+                    <span className="ml-auto text-xs text-zinc-400">8m</span>
                   </div>
                 </div>
               </div>
