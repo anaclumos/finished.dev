@@ -1,5 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { SignedIn, SignedOut } from '@clerk/clerk-react'
+import {
+  SignedIn,
+  SignedOut,
+  ClerkLoading,
+  ClerkLoaded,
+} from '@clerk/clerk-react'
 import { Button } from '@/components/ui/button'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
@@ -40,17 +45,20 @@ const useCases = [
   {
     icon: LaptopIcon,
     title: 'Long-running AI Tasks',
-    description: 'Know when Claude, GPT, or your local LLM finishes a complex task.',
+    description:
+      'Know when Claude, GPT, or your local LLM finishes a complex task.',
   },
   {
     icon: CloudIcon,
     title: 'Background Builds',
-    description: 'Get notified when your builds, tests, or deployments complete.',
+    description:
+      'Get notified when your builds, tests, or deployments complete.',
   },
   {
     icon: FlashIcon,
     title: 'Agent Workflows',
-    description: 'Monitor multi-step AI agent workflows across multiple machines.',
+    description:
+      'Monitor multi-step AI agent workflows across multiple machines.',
   },
 ]
 
@@ -79,7 +87,7 @@ function LandingPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <SignedOut>
+            <ClerkLoading>
               <Link
                 to="/sign-in"
                 className="text-sm font-medium text-zinc-600 hover:text-zinc-900"
@@ -89,15 +97,28 @@ function LandingPage() {
               <Link to="/sign-up">
                 <Button size="sm">Get started</Button>
               </Link>
-            </SignedOut>
-            <SignedIn>
-              <Link to="/dashboard">
-                <Button size="sm">
-                  Dashboard
-                  <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
-                </Button>
-              </Link>
-            </SignedIn>
+            </ClerkLoading>
+            <ClerkLoaded>
+              <SignedOut>
+                <Link
+                  to="/sign-in"
+                  className="text-sm font-medium text-zinc-600 hover:text-zinc-900"
+                >
+                  Sign in
+                </Link>
+                <Link to="/sign-up">
+                  <Button size="sm">Get started</Button>
+                </Link>
+              </SignedOut>
+              <SignedIn>
+                <Link to="/dashboard">
+                  <Button size="sm">
+                    Dashboard
+                    <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
+                  </Button>
+                </Link>
+              </SignedIn>
+            </ClerkLoaded>
           </div>
         </nav>
       </header>
@@ -107,7 +128,11 @@ function LandingPage() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="mx-auto max-w-3xl text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-1.5 text-sm text-zinc-600">
-              <HugeiconsIcon icon={FlashIcon} size={14} className="text-yellow-500" />
+              <HugeiconsIcon
+                icon={FlashIcon}
+                size={14}
+                className="text-yellow-500"
+              />
               AI Agent Fleet Management
             </div>
 
@@ -119,26 +144,37 @@ function LandingPage() {
 
             <p className="mt-6 text-lg leading-relaxed text-zinc-600">
               Stop checking terminals. Get instant push notifications when your
-              AI agents, builds, or background tasks complete. One CLI command, zero friction.
+              AI agents, builds, or background tasks complete. One CLI command,
+              zero friction.
             </p>
 
             <div className="mt-10 flex items-center justify-center gap-4">
-              <SignedOut>
+              <ClerkLoading>
                 <Link to="/sign-up">
                   <Button size="lg">
-                    Get started free
+                    Get Started
                     <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
                   </Button>
                 </Link>
-              </SignedOut>
-              <SignedIn>
-                <Link to="/dashboard">
-                  <Button size="lg">
-                    Go to Dashboard
-                    <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
-                  </Button>
-                </Link>
-              </SignedIn>
+              </ClerkLoading>
+              <ClerkLoaded>
+                <SignedOut>
+                  <Link to="/sign-up">
+                    <Button size="lg">
+                      Get started
+                      <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
+                    </Button>
+                  </Link>
+                </SignedOut>
+                <SignedIn>
+                  <Link to="/dashboard">
+                    <Button size="lg">
+                      Go to Dashboard
+                      <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
+                    </Button>
+                  </Link>
+                </SignedIn>
+              </ClerkLoaded>
             </div>
 
             {/* CLI Preview */}
@@ -244,7 +280,9 @@ function LandingPage() {
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-900 text-white">
                   <HugeiconsIcon icon={feature.icon} size={24} />
                 </div>
-                <h3 className="text-lg font-semibold text-zinc-900">{feature.title}</h3>
+                <h3 className="text-lg font-semibold text-zinc-900">
+                  {feature.title}
+                </h3>
                 <p className="mt-2 text-zinc-600">{feature.description}</p>
               </div>
             ))}
@@ -261,7 +299,8 @@ function LandingPage() {
                 Perfect for
               </h2>
               <p className="mt-4 text-lg text-zinc-600">
-                Anyone who runs async tasks and wants to know when they&apos;re done.
+                Anyone who runs async tasks and wants to know when they&apos;re
+                done.
               </p>
 
               <div className="mt-8 space-y-6">
@@ -271,22 +310,36 @@ function LandingPage() {
                       <HugeiconsIcon icon={useCase.icon} size={20} />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-zinc-900">{useCase.title}</h3>
-                      <p className="mt-1 text-sm text-zinc-600">{useCase.description}</p>
+                      <h3 className="font-semibold text-zinc-900">
+                        {useCase.title}
+                      </h3>
+                      <p className="mt-1 text-sm text-zinc-600">
+                        {useCase.description}
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
 
               <div className="mt-10">
-                <SignedOut>
+                <ClerkLoading>
                   <Link to="/sign-up">
                     <Button>
-                      Get started for free
+                      Get Started
                       <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
                     </Button>
                   </Link>
-                </SignedOut>
+                </ClerkLoading>
+                <ClerkLoaded>
+                  <SignedOut>
+                    <Link to="/sign-up">
+                      <Button>
+                        Get Started
+                        <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
+                      </Button>
+                    </Link>
+                  </SignedOut>
+                </ClerkLoaded>
               </div>
             </div>
 
@@ -297,24 +350,48 @@ function LandingPage() {
                 </div>
                 <div className="space-y-3 font-mono text-sm">
                   <div className="flex items-center gap-2 text-zinc-600">
-                    <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} className="text-green-500" />
+                    <HugeiconsIcon
+                      icon={CheckmarkCircle02Icon}
+                      size={16}
+                      className="text-green-500"
+                    />
                     <span>Code review completed</span>
-                    <span className="ml-auto text-xs text-zinc-400">2m ago</span>
+                    <span className="ml-auto text-xs text-zinc-400">
+                      2m ago
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-zinc-600">
-                    <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} className="text-green-500" />
+                    <HugeiconsIcon
+                      icon={CheckmarkCircle02Icon}
+                      size={16}
+                      className="text-green-500"
+                    />
                     <span>Tests generated</span>
-                    <span className="ml-auto text-xs text-zinc-400">5m ago</span>
+                    <span className="ml-auto text-xs text-zinc-400">
+                      5m ago
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-zinc-600">
-                    <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} className="text-green-500" />
+                    <HugeiconsIcon
+                      icon={CheckmarkCircle02Icon}
+                      size={16}
+                      className="text-green-500"
+                    />
                     <span>Documentation updated</span>
-                    <span className="ml-auto text-xs text-zinc-400">8m ago</span>
+                    <span className="ml-auto text-xs text-zinc-400">
+                      8m ago
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-zinc-600">
-                    <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} className="text-green-500" />
+                    <HugeiconsIcon
+                      icon={CheckmarkCircle02Icon}
+                      size={16}
+                      className="text-green-500"
+                    />
                     <span>PR created</span>
-                    <span className="ml-auto text-xs text-zinc-400">12m ago</span>
+                    <span className="ml-auto text-xs text-zinc-400">
+                      12m ago
+                    </span>
                   </div>
                 </div>
               </div>
@@ -330,31 +407,45 @@ function LandingPage() {
             Stop watching terminals
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
-            Let your AI agents notify you. Free to start, no credit card required.
+            Let your AI agents notify you. to start, no credit card
+            required.
           </p>
           <div className="mt-10">
-            <SignedOut>
+            <ClerkLoading>
               <Link to="/sign-up">
                 <Button
                   size="lg"
                   className="bg-white text-zinc-900 hover:bg-zinc-100"
                 >
-                  Get started free
+                  Get started
                   <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
                 </Button>
               </Link>
-            </SignedOut>
-            <SignedIn>
-              <Link to="/dashboard">
-                <Button
-                  size="lg"
-                  className="bg-white text-zinc-900 hover:bg-zinc-100"
-                >
-                  Go to Dashboard
-                  <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
-                </Button>
-              </Link>
-            </SignedIn>
+            </ClerkLoading>
+            <ClerkLoaded>
+              <SignedOut>
+                <Link to="/sign-up">
+                  <Button
+                    size="lg"
+                    className="bg-white text-zinc-900 hover:bg-zinc-100"
+                  >
+                    Get started
+                    <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
+                  </Button>
+                </Link>
+              </SignedOut>
+              <SignedIn>
+                <Link to="/dashboard">
+                  <Button
+                    size="lg"
+                    className="bg-white text-zinc-900 hover:bg-zinc-100"
+                  >
+                    Go to Dashboard
+                    <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
+                  </Button>
+                </Link>
+              </SignedIn>
+            </ClerkLoaded>
           </div>
         </div>
       </section>
@@ -370,7 +461,8 @@ function LandingPage() {
               <span className="font-semibold text-white">finished.dev</span>
             </div>
             <p className="text-sm text-zinc-500">
-              &copy; {new Date().getFullYear()} finished.dev. All rights reserved.
+              &copy; {new Date().getFullYear()} finished.dev. All rights
+              reserved.
             </p>
           </div>
         </div>

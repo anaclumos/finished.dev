@@ -20,6 +20,7 @@ const config = defineConfig({
     nitro({
       preset: isVercel ? 'vercel' : 'node-server',
       compatibilityDate: 'latest',
+      scanDirs: ['server'],
     }),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
