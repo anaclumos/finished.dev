@@ -18,9 +18,9 @@ const config = defineConfig({
   plugins: [
     devtools(),
     nitro({
-      // Use Vercel preset when deploying to Vercel, node-server locally
       preset: isVercel ? 'vercel' : 'node-server',
       compatibilityDate: 'latest',
+      scanDirs: ['server'],
     }),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
