@@ -3,5 +3,6 @@
   "framework": "tanstack-start",
   "buildCommand": "bunx convex deploy --cmd 'bun run build' --cmd-url-env-var-name VITE_CONVEX_URL",
   "outputDirectory": ".vercel/output",
-  "regions": ["iad1"]
+  "regions": ["pdx1", "icn1", "lhr1"],
+  "fluid": true
 }
