@@ -7,6 +7,24 @@ interface CodeBlockProps {
   title?: string
 }
 
+const shikiTheme = {
+  name: 'terminal-yellow',
+  type: 'dark' as const,
+  colors: {
+    'editor.background': 'transparent',
+    'editor.foreground': '#d4d4d4',
+  },
+  settings: [
+    { scope: ['comment'], settings: { foreground: '#71717a' } },
+    { scope: ['string', 'string.quoted'], settings: { foreground: '#fcd34d' } },
+    { scope: ['keyword', 'storage'], settings: { foreground: '#c084fc' } },
+    { scope: ['variable', 'entity.name.function'], settings: { foreground: '#60a5fa' } },
+    { scope: ['constant', 'constant.numeric'], settings: { foreground: '#f59e0b' } },
+    { scope: ['entity.name', 'support.function'], settings: { foreground: '#fbbf24' } },
+    { scope: ['punctuation', 'meta.brace'], settings: { foreground: '#a1a1aa' } },
+  ],
+}
+
 export function CodeBlock({
   code,
   lang = 'bash',
@@ -17,7 +35,7 @@ export function CodeBlock({
   useEffect(() => {
     codeToHtml(code, {
       lang,
-      theme: 'github-dark',
+      theme: shikiTheme,
     }).then(setHtml)
   }, [code, lang])
 
@@ -55,7 +73,7 @@ export function InlineCode({ children, lang = 'bash' }: InlineCodeProps) {
   useEffect(() => {
     codeToHtml(children, {
       lang,
-      theme: 'github-dark',
+      theme: shikiTheme,
     }).then(setHtml)
   }, [children, lang])
 
