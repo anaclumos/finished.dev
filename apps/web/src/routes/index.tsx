@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button'
 import { CodeBlock, InlineCode } from '@/components/code-block'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  ArrowRight01Icon,
   Notification01Icon,
   CommandIcon,
   Clock01Icon,
@@ -111,10 +110,7 @@ function LandingPage() {
               </SignedOut>
               <SignedIn>
                 <Link to="/dashboard">
-                  <Button size="sm">
-                    Dashboard
-                    <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
-                  </Button>
+                  <Button size="sm">Dashboard</Button>
                 </Link>
               </SignedIn>
             </ClerkLoaded>
@@ -150,27 +146,18 @@ function LandingPage() {
             <div className="mt-10 flex items-center justify-center gap-4">
               <ClerkLoading>
                 <Link to="/sign-up">
-                  <Button size="lg">
-                    Get Started
-                    <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
-                  </Button>
+                  <Button size="lg">Get Started</Button>
                 </Link>
               </ClerkLoading>
               <ClerkLoaded>
                 <SignedOut>
                   <Link to="/sign-up">
-                    <Button size="lg">
-                      Get Started
-                      <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
-                    </Button>
+                    <Button size="lg">Get Started</Button>
                   </Link>
                 </SignedOut>
                 <SignedIn>
                   <Link to="/dashboard">
-                    <Button size="lg">
-                      Go to Dashboard
-                      <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
-                    </Button>
+                    <Button size="lg">Go to Dashboard</Button>
                   </Link>
                 </SignedIn>
               </ClerkLoaded>
@@ -309,19 +296,13 @@ function LandingPage() {
               <div className="mt-10">
                 <ClerkLoading>
                   <Link to="/sign-up">
-                    <Button>
-                      Get Started
-                      <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
-                    </Button>
+                    <Button>Get Started</Button>
                   </Link>
                 </ClerkLoading>
                 <ClerkLoaded>
                   <SignedOut>
                     <Link to="/sign-up">
-                      <Button>
-                        Get Started
-                        <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
-                      </Button>
+                      <Button>Get Started</Button>
                     </Link>
                   </SignedOut>
                 </ClerkLoaded>
@@ -411,7 +392,6 @@ function LandingPage() {
                   className="bg-white text-zinc-900 hover:bg-zinc-100"
                 >
                   Get Started
-                  <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
                 </Button>
               </Link>
             </ClerkLoading>
@@ -423,7 +403,6 @@ function LandingPage() {
                     className="bg-white text-zinc-900 hover:bg-zinc-100"
                   >
                     Get Started
-                    <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
                   </Button>
                 </Link>
               </SignedOut>
@@ -434,7 +413,6 @@ function LandingPage() {
                     className="bg-white text-zinc-900 hover:bg-zinc-100"
                   >
                     Go to Dashboard
-                    <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
                   </Button>
                 </Link>
               </SignedIn>
