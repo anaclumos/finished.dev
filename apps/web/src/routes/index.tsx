@@ -80,9 +80,7 @@ function LandingPage() {
       <header className="fixed inset-x-0 top-0 z-50 border-b border-zinc-100 bg-white/80 backdrop-blur-sm">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900 text-white">
-              <HugeiconsIcon icon={Notification01Icon} size={18} />
-            </div>
+            <img src="/logo.png" alt="finished.dev logo" className="h-8 w-8" />
             <span className="font-semibold text-zinc-900">finished.dev</span>
           </div>
 
@@ -92,10 +90,10 @@ function LandingPage() {
                 to="/sign-in"
                 className="text-sm font-medium text-zinc-600 hover:text-zinc-900"
               >
-                Sign in
+                Sign In
               </Link>
               <Link to="/sign-up">
-                <Button size="sm">Get started</Button>
+                <Button size="sm">Get Started</Button>
               </Link>
             </ClerkLoading>
             <ClerkLoaded>
@@ -104,10 +102,10 @@ function LandingPage() {
                   to="/sign-in"
                   className="text-sm font-medium text-zinc-600 hover:text-zinc-900"
                 >
-                  Sign in
+                  Sign In
                 </Link>
                 <Link to="/sign-up">
-                  <Button size="sm">Get started</Button>
+                  <Button size="sm">Get Started</Button>
                 </Link>
               </SignedOut>
               <SignedIn>
@@ -161,7 +159,7 @@ function LandingPage() {
                 <SignedOut>
                   <Link to="/sign-up">
                     <Button size="lg">
-                      Get started
+                      Get Started
                       <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
                     </Button>
                   </Link>
@@ -417,7 +415,7 @@ function LandingPage() {
                   size="lg"
                   className="bg-white text-zinc-900 hover:bg-zinc-100"
                 >
-                  Get started
+                  Get Started
                   <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
                 </Button>
               </Link>
@@ -429,7 +427,7 @@ function LandingPage() {
                     size="lg"
                     className="bg-white text-zinc-900 hover:bg-zinc-100"
                   >
-                    Get started
+                    Get Started
                     <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
                   </Button>
                 </Link>

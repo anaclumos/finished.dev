@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#0d9488',
+        backgroundColor: '#064e3b',
         padding: '60px',
         fontFamily: 'Figtree',
       }}
@@ -35,20 +35,21 @@ export default defineEventHandler(async (event) => {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '16px',
+          gap: '8px',
         }}
       >
         <img
           src={logoBase64}
-          width={56}
-          height={56}
+          alt="finished.dev logo"
+          width={80}
+          height={80}
           style={{
-            borderRadius: '12px',
+            borderRadius: '16px',
           }}
         />
         <span
           style={{
-            fontSize: '32px',
+            fontSize: '52px',
             fontWeight: 600,
             color: '#ffffff',
           }}
@@ -61,10 +62,10 @@ export default defineEventHandler(async (event) => {
         style={{
           display: 'flex',
           flexDirection: 'column',
-          marginTop: '40px',
-          backgroundColor: '#042f2e',
+          marginTop: '32px',
+          backgroundColor: '#18181b',
           borderRadius: '16px',
-          border: '1px solid #134e4a',
+          border: '1px solid #3f3f46',
           overflow: 'hidden',
           flex: 1,
         }}
@@ -75,29 +76,29 @@ export default defineEventHandler(async (event) => {
             alignItems: 'center',
             gap: '8px',
             padding: '16px 20px',
-            borderBottom: '1px solid #134e4a',
+            borderBottom: '1px solid #3f3f46',
           }}
         >
           <div
             style={{
-              width: '12px',
-              height: '12px',
+              width: '14px',
+              height: '14px',
               borderRadius: '50%',
               backgroundColor: '#ef4444',
             }}
           />
           <div
             style={{
-              width: '12px',
-              height: '12px',
+              width: '14px',
+              height: '14px',
               borderRadius: '50%',
               backgroundColor: '#eab308',
             }}
           />
           <div
             style={{
-              width: '12px',
-              height: '12px',
+              width: '14px',
+              height: '14px',
               borderRadius: '50%',
               backgroundColor: '#22c55e',
             }}
@@ -105,11 +106,11 @@ export default defineEventHandler(async (event) => {
           <span
             style={{
               marginLeft: '12px',
-              fontSize: '14px',
-              color: '#5eead4',
+              fontSize: '22px',
+              color: '#a1a1aa',
             }}
           >
-            ./finished
+            terminal
           </span>
         </div>
 
@@ -125,7 +126,7 @@ export default defineEventHandler(async (event) => {
         >
           <div
             style={{
-              fontSize: '56px',
+              fontSize: '72px',
               fontWeight: 600,
               color: '#ffffff',
               textAlign: 'center',
@@ -136,9 +137,9 @@ export default defineEventHandler(async (event) => {
           </div>
           <div
             style={{
-              fontSize: '56px',
+              fontSize: '72px',
               fontWeight: 600,
-              color: '#99f6e4',
+              color: '#6ee7b7',
               textAlign: 'center',
               lineHeight: 1.2,
             }}
@@ -152,14 +153,14 @@ export default defineEventHandler(async (event) => {
         style={{
           display: 'flex',
           justifyContent: 'center',
-          marginTop: '32px',
+          marginTop: '28px',
         }}
       >
         <span
           style={{
-            fontSize: '22px',
+            fontSize: '32px',
             fontWeight: 400,
-            color: '#ccfbf1',
+            color: '#a7f3d0',
           }}
         >
           Stop watching terminals. Get instant push notifications.
