@@ -138,7 +138,7 @@ function LandingPage() {
             <h1 className="text-5xl font-semibold tracking-tight text-zinc-900 sm:text-6xl">
               know when your
               <br />
-              <span className="text-amber-400">agents finish</span>
+              <span className="text-amber-500">agents finish</span>
             </h1>
 
             <p className="mt-6 text-lg leading-relaxed text-zinc-600">
