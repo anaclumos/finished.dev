@@ -130,7 +130,7 @@ function LandingPage() {
               <HugeiconsIcon
                 icon={FlashIcon}
                 size={14}
-                className="text-yellow-500"
+                className="text-amber-500"
               />
               Agent Fleet Management
             </div>
@@ -448,9 +448,7 @@ function LandingPage() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-zinc-900">
-                <HugeiconsIcon icon={Notification01Icon} size={18} />
-              </div>
+              <img src="/logo.png" alt="finished.dev logo" className="h-8 w-8" />
               <span className="font-semibold text-white">finished.dev</span>
             </div>
             <p className="text-sm text-zinc-500">

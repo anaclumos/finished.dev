@@ -52,8 +52,8 @@ const statusConfig = {
   },
   cancelled: {
     icon: AlertCircleIcon,
-    color: 'text-yellow-600',
-    bg: 'bg-yellow-50',
+    color: 'text-amber-600',
+    bg: 'bg-amber-50',
     label: 'Cancelled',
   },
 }
