@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
+import { api } from '@convex/_generated/api'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Field, FieldGroup } from '@/components/ui/field'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   Key01Icon,
@@ -21,7 +21,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { useState } from 'react'
 
-export const Route = createFileRoute('/_dashboard/settings')({
+export const Route = createFileRoute('/dashboard/settings')({
   component: SettingsPage,
 })
 

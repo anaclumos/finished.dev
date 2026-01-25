@@ -8,7 +8,7 @@ import {
   Notification01Icon,
 } from '@hugeicons/core-free-icons'
 
-export const Route = createFileRoute('/_dashboard')({
+export const Route = createFileRoute('/dashboard')({
   component: DashboardLayout,
 })
 

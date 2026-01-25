@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
+import { api } from '@convex/_generated/api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -11,7 +11,7 @@ import {
   Clock01Icon,
 } from '@hugeicons/core-free-icons'
 
-export const Route = createFileRoute('/_dashboard/')({
+export const Route = createFileRoute('/dashboard/')({
   component: DashboardPage,
 })
 
