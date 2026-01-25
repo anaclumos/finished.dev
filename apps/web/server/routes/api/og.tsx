@@ -135,7 +135,7 @@ export default defineEventHandler(async (event) => {
               lineHeight: 1.2,
             }}
           >
-            know when your
+            Know When Your
           </div>
           <div
             style={{
@@ -146,7 +146,7 @@ export default defineEventHandler(async (event) => {
               lineHeight: 1.2,
             }}
           >
-            agents finish
+            Agents Finish
           </div>
         </div>
       </div>
