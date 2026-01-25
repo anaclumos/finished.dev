@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#064e3b',
+        backgroundColor: '#022c22',
         padding: '60px',
         fontFamily: 'Figtree',
       }}
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '8px',
+          gap: '0px',
         }}
       >
         <img
@@ -110,7 +110,7 @@ export default defineEventHandler(async (event) => {
               color: '#a1a1aa',
             }}
           >
-            terminal
+            Terminal
           </span>
         </div>
 
