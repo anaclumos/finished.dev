@@ -6,6 +6,7 @@ import {
   ClerkLoaded,
 } from '@clerk/clerk-react'
 import { Button } from '@/components/ui/button'
+import { CodeBlock } from '@/components/code-block'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   ArrowRight01Icon,
@@ -176,16 +177,8 @@ function LandingPage() {
             </div>
 
             {/* CLI Preview */}
-            <div className="mt-12 rounded-xl border border-zinc-200 bg-zinc-900 p-1 shadow-2xl">
-              <div className="flex items-center gap-1.5 border-b border-zinc-700 px-4 py-3">
-                <div className="h-3 w-3 rounded-full bg-red-500" />
-                <div className="h-3 w-3 rounded-full bg-yellow-500" />
-                <div className="h-3 w-3 rounded-full bg-green-500" />
-                <span className="ml-2 text-xs text-zinc-500">Terminal</span>
-              </div>
-              <pre className="p-4 text-left font-mono text-sm text-zinc-300">
-                <code>{cliExample}</code>
-              </pre>
+            <div className="mt-12">
+              <CodeBlock code={cliExample} />
             </div>
           </div>
         </div>

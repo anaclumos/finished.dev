@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import satori from 'satori'
 import sharp from 'sharp'
 import { defineEventHandler, setHeader } from 'h3'
@@ -12,12 +10,16 @@ const fontBoldPromise = fetch(
   'https://cdn.jsdelivr.net/fontsource/fonts/figtree@latest/latin-600-normal.ttf'
 ).then((res) => res.arrayBuffer())
 
-export default defineEventHandler(async (event) => {
-  const [fontData, fontBoldData] = await Promise.all([fontPromise, fontBoldPromise])
+const logoPromise = fetch('https://finished.dev/logo.png')
+  .then((res) => res.arrayBuffer())
+  .then((buf) => `data:image/png;base64,${Buffer.from(buf).toString('base64')}`)
 
-  const logoPath = join(process.cwd(), 'public', 'logo.png')
-  const logoBuffer = readFileSync(logoPath)
-  const logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`
+export default defineEventHandler(async (event) => {
+  const [fontData, fontBoldData, logoBase64] = await Promise.all([
+    fontPromise,
+    fontBoldPromise,
+    logoPromise,
+  ])
 
   const svg = await satori(
     <div
