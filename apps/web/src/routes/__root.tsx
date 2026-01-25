@@ -16,7 +16,11 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'finished.dev - Status Pages, Monitoring & Webhooks',
+      },
+      {
+        name: 'description',
+        content: 'Beautiful status pages, reliable uptime monitoring, and powerful webhook management.',
       },
     ],
     links: [

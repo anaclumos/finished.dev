@@ -1,14 +1,25 @@
 {
   "name": "@finished/cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
+  "description": "AI Agent Fleet Management CLI - Get notified when your AI agents finish tasks",
   "type": "module",
   "bin": {
-    "finished-cli": "./src/index.ts"
+    "finished": "./src/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@types/bun": "^1.2.19",
     "typescript": "^5.7.3"
-  }
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "notifications",
+    "cli",
+    "productivity"
+  ],
+  "author": "",
+  "license": "MIT"
 }

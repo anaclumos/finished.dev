@@ -1,19 +1,69 @@
 /**
- * Web Push Helper Functions
+ * Web Push notification utilities for finished.dev
  *
- * Provides utilities for service worker registration and push subscription
- * using the Web Push API and VAPID public key from environment variables.
+ * Provides service worker registration, push subscription management,
+ * and notification handling using the Web Push API.
  */
 
+const SW_PATH = '/sw.js'
+
 /**
- * Convert a base64url-encoded VAPID public key to a Uint8Array
- * Required for the `applicationServerKey` parameter in pushManager.subscribe()
- *
- * @param base64String - Base64url-encoded VAPID public key
- * @returns Uint8Array representation of the key
+ * Check if push notifications are supported
+ */
+export function isPushSupported(): boolean {
+  if (typeof window === 'undefined') return false
+  return (
+    'serviceWorker' in navigator &&
+    'PushManager' in window &&
+    'Notification' in window
+  )
+}
+
+/**
+ * Get the current notification permission status
+ */
+export function getPermissionStatus(): NotificationPermission {
+  if (!isPushSupported()) return 'denied'
+  return Notification.permission
+}
+
+/**
+ * Request notification permission from the user
+ */
+export async function requestPermission(): Promise<NotificationPermission> {
+  if (!isPushSupported()) {
+    console.warn('[Push] Push notifications not supported')
+    return 'denied'
+  }
+
+  const permission = await Notification.requestPermission()
+  return permission
+}
+
+/**
+ * Register the service worker
+ */
+export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+    return null
+  }
+
+  try {
+    const registration = await navigator.serviceWorker.register(SW_PATH, {
+      scope: '/',
+    })
+    console.log('[Push] Service worker registered:', registration.scope)
+    return registration
+  } catch (error) {
+    console.error('[Push] Service worker registration failed:', error)
+    return null
+  }
+}
+
+/**
+ * Convert a URL-safe base64 string to a Uint8Array
  */
 export function urlBase64ToUint8Array(base64String: string): Uint8Array {
-  // Add padding if needed
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
 
@@ -28,89 +78,147 @@ export function urlBase64ToUint8Array(base64String: string): Uint8Array {
 }
 
 /**
- * Register the service worker for push notifications
- *
- * @returns ServiceWorkerRegistration if successful, null if not available or already registered
- */
-export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
-  // Guard against non-browser environments
-  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
-    return null
-  }
-
-  try {
-    const registration = await navigator.serviceWorker.register(
-      '/service-worker.js',
-      {
-        scope: '/',
-      },
-    )
-    console.log('Service Worker registered successfully:', registration)
-    return registration
-  } catch (error) {
-    console.error('Service Worker registration failed:', error)
-    return null
-  }
-}
-
-/**
- * Subscribe to push notifications
- *
- * @param registration - ServiceWorkerRegistration from registerServiceWorker()
- * @returns PushSubscription if successful
- * @throws Error if subscription fails or VAPID key is not configured
+ * Get or create a push subscription
  */
 export async function subscribeToPush(
-  registration: ServiceWorkerRegistration,
-): Promise<PushSubscription> {
-  // Guard against non-browser environments
-  if (typeof window === 'undefined') {
-    throw new Error(
-      'subscribeToPush can only be called in a browser environment',
-    )
+  vapidPublicKey?: string
+): Promise<PushSubscription | null> {
+  if (!isPushSupported()) {
+    console.warn('[Push] Push notifications not supported')
+    return null
   }
 
-  const publicKeyString = import.meta.env.VITE_WEB_PUSH_PUBLIC_KEY
-  if (!publicKeyString) {
-    throw new Error('VITE_WEB_PUSH_PUBLIC_KEY environment variable is not set')
+  // Use env var if no key provided
+  const publicKey = vapidPublicKey || import.meta.env.VITE_WEB_PUSH_PUBLIC_KEY
+  if (!publicKey) {
+    console.error('[Push] VAPID public key not configured')
+    return null
   }
 
-  const applicationServerKey = urlBase64ToUint8Array(
-    publicKeyString,
-  ) as BufferSource
+  // Check permission
+  const permission = await requestPermission()
+  if (permission !== 'granted') {
+    console.warn('[Push] Notification permission denied')
+    return null
+  }
 
+  // Get service worker registration
+  const registration = await navigator.serviceWorker.ready
+
+  // Check for existing subscription
+  let subscription = await registration.pushManager.getSubscription()
+
+  if (subscription) {
+    console.log('[Push] Existing subscription found')
+    return subscription
+  }
+
+  // Create new subscription
   try {
-    const subscription = await registration.pushManager.subscribe({
+    const convertedVapidKey = urlBase64ToUint8Array(publicKey)
+    subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey,
+      applicationServerKey: convertedVapidKey as BufferSource,
     })
-    console.log('Push subscription successful:', subscription)
+    console.log('[Push] New subscription created')
     return subscription
   } catch (error) {
-    console.error('Push subscription failed:', error)
-    throw error
+    console.error('[Push] Failed to subscribe:', error)
+    return null
   }
 }
 
 /**
  * Unsubscribe from push notifications
- *
- * @param subscription - PushSubscription to unsubscribe from
- * @returns true if unsubscription was successful, false otherwise
  */
-export async function unsubscribeFromPush(
-  subscription: PushSubscription,
-): Promise<boolean> {
-  try {
-    const success = await subscription.unsubscribe()
-    if (success) {
-      console.log('Push unsubscription successful')
-    } else {
-      console.warn('Push unsubscription returned false')
-    }
-    return success
-  } catch (error) {
-    console.error('Push unsubscription failed:', error)
+export async function unsubscribeFromPush(): Promise<boolean> {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
     return false
+  }
+
+  try {
+    const registration = await navigator.serviceWorker.ready
+    const subscription = await registration.pushManager.getSubscription()
+
+    if (subscription) {
+      await subscription.unsubscribe()
+      console.log('[Push] Unsubscribed successfully')
+      return true
+    }
+
+    return false
+  } catch (error) {
+    console.error('[Push] Failed to unsubscribe:', error)
+    return false
+  }
+}
+
+/**
+ * Get the current push subscription
+ */
+export async function getSubscription(): Promise<PushSubscription | null> {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+    return null
+  }
+
+  try {
+    const registration = await navigator.serviceWorker.ready
+    return await registration.pushManager.getSubscription()
+  } catch (error) {
+    console.error('[Push] Failed to get subscription:', error)
+    return null
+  }
+}
+
+/**
+ * Extract subscription keys for server storage
+ */
+export function extractSubscriptionKeys(subscription: PushSubscription): {
+  endpoint: string
+  p256dh: string
+  auth: string
+} {
+  const key = subscription.getKey('p256dh')
+  const auth = subscription.getKey('auth')
+
+  return {
+    endpoint: subscription.endpoint,
+    p256dh: key ? arrayBufferToBase64(key) : '',
+    auth: auth ? arrayBufferToBase64(auth) : '',
+  }
+}
+
+/**
+ * Convert an ArrayBuffer to a base64 string
+ */
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer)
+  let binary = ''
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return window.btoa(binary)
+}
+
+/**
+ * Initialize push notifications (register SW + subscribe)
+ * Call this on app load to set up push notifications
+ */
+export async function initializePush(
+  onSubscription?: (subscription: PushSubscription) => void
+): Promise<void> {
+  if (!isPushSupported()) {
+    console.warn('[Push] Push notifications not supported in this browser')
+    return
+  }
+
+  // Register service worker
+  await registerServiceWorker()
+
+  // Subscribe to push
+  const subscription = await subscribeToPush()
+
+  if (subscription && onSubscription) {
+    onSubscription(subscription)
   }
 }
