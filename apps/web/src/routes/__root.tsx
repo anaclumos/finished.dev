@@ -16,11 +16,55 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'finished.dev - Status Pages, Monitoring & Webhooks',
+        title: 'finished.dev - Know when your AI agents finish',
       },
       {
         name: 'description',
-        content: 'Beautiful status pages, reliable uptime monitoring, and powerful webhook management.',
+        content: 'Stop watching terminals. Get instant push notifications when your AI agents, builds, or background tasks complete.',
+      },
+      {
+        property: 'og:type',
+        content: 'website',
+      },
+      {
+        property: 'og:url',
+        content: 'https://finished.dev',
+      },
+      {
+        property: 'og:title',
+        content: 'finished.dev - Know when your AI agents finish',
+      },
+      {
+        property: 'og:description',
+        content: 'Stop watching terminals. Get instant push notifications when your AI agents, builds, or background tasks complete.',
+      },
+      {
+        property: 'og:image',
+        content: 'https://finished.dev/api/og',
+      },
+      {
+        property: 'og:image:width',
+        content: '1200',
+      },
+      {
+        property: 'og:image:height',
+        content: '630',
+      },
+      {
+        name: 'twitter:card',
+        content: 'summary_large_image',
+      },
+      {
+        name: 'twitter:title',
+        content: 'finished.dev - Know when your AI agents finish',
+      },
+      {
+        name: 'twitter:description',
+        content: 'Stop watching terminals. Get instant push notifications when your AI agents, builds, or background tasks complete.',
+      },
+      {
+        name: 'twitter:image',
+        content: 'https://finished.dev/api/og',
       },
     ],
     links: [
