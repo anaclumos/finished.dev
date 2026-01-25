@@ -332,8 +332,8 @@ function LandingPage() {
               <div className="rounded-2xl border border-zinc-200 bg-white p-6">
                 <div className="mb-4 flex items-center gap-2 text-sm font-medium text-zinc-500">
                   <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500"></span>
                   </span>
                   Live Notifications
                 </div>
@@ -342,7 +342,7 @@ function LandingPage() {
                     <HugeiconsIcon
                       icon={CheckmarkCircle02Icon}
                       size={16}
-                      className="text-green-500"
+                      className="text-zinc-400"
                     />
                     <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500">
                       claude
@@ -354,7 +354,7 @@ function LandingPage() {
                     <HugeiconsIcon
                       icon={CheckmarkCircle02Icon}
                       size={16}
-                      className="text-green-500"
+                      className="text-zinc-400"
                     />
                     <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500">
                       cursor
@@ -366,7 +366,7 @@ function LandingPage() {
                     <HugeiconsIcon
                       icon={CheckmarkCircle02Icon}
                       size={16}
-                      className="text-green-500"
+                      className="text-zinc-400"
                     />
                     <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500">
                       opencode
@@ -378,7 +378,7 @@ function LandingPage() {
                     <HugeiconsIcon
                       icon={CheckmarkCircle02Icon}
                       size={16}
-                      className="text-green-500"
+                      className="text-zinc-400"
                     />
                     <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500">
                       cli

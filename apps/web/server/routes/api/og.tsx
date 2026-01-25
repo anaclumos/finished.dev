@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#022c22',
+        backgroundColor: '#1c1206',
         padding: '60px',
         fontFamily: 'Figtree',
       }}
@@ -141,7 +141,7 @@ export default defineEventHandler(async (event) => {
             style={{
               fontSize: '72px',
               fontWeight: 600,
-              color: '#6ee7b7',
+              color: '#fbbf24',
               textAlign: 'center',
               lineHeight: 1.2,
             }}
@@ -162,7 +162,7 @@ export default defineEventHandler(async (event) => {
           style={{
             fontSize: '32px',
             fontWeight: 400,
-            color: '#a7f3d0',
+            color: '#fde68a',
           }}
         >
           Stop watching terminals. Get instant push notifications.
