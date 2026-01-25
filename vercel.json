@@ -1,8 +1,0 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "tanstack-start",
-  "installCommand": "bun install",
-  "buildCommand": "turbo run build --filter=@finished/web",
-  "outputDirectory": "apps/web/.vercel/output",
-  "regions": ["iad1"]
-}
