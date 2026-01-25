@@ -76,7 +76,7 @@ function DashboardPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-zinc-900">Dashboard</h1>
         <p className="mt-1 text-sm text-zinc-600">
-          Monitor your AI agent task completions in real-time.
+          Monitor your Agent task completions in real-time.
         </p>
       </div>
 

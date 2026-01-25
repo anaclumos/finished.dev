@@ -16,9 +16,9 @@ interface Config {
 }
 
 const HELP = `
-finished v${VERSION} - AI Agent Fleet Management CLI
+finished v${VERSION} - Agent Fleet Management CLI
 
-Get notified when your AI agents finish their tasks.
+Get notified when your agents finish their tasks.
 
 USAGE:
   finished <command> [options]

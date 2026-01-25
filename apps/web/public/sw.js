@@ -15,7 +15,7 @@ self.addEventListener('push', (event) => {
 
   let data = {
     title: 'Task Completed',
-    body: 'An AI agent has finished a task.',
+    body: 'An Agent has finished a task.',
     data: { url: '/dashboard' },
   }
 

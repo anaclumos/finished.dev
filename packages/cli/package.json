@@ -1,7 +1,7 @@
 {
   "name": "@finished/cli",
   "version": "0.2.0",
-  "description": "AI Agent Fleet Management CLI - Get notified when your AI agents finish tasks",
+  "description": "Agent Fleet Management CLI - Get notified when your agents finish tasks",
   "type": "module",
   "bin": {
     "finished": "./src/index.ts"

@@ -16,11 +16,11 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'finished.dev - Know when your AI agents finish',
+        title: 'finished.dev - know when your agents finish',
       },
       {
         name: 'description',
-        content: 'Stop watching terminals. Get instant push notifications when your AI agents, builds, or background tasks complete.',
+        content: 'Stop watching terminals. Get instant push notifications when your agents, builds, or background tasks complete.',
       },
       {
         property: 'og:type',
@@ -32,11 +32,11 @@ export const Route = createRootRoute({
       },
       {
         property: 'og:title',
-        content: 'finished.dev - Know when your AI agents finish',
+        content: 'finished.dev - know when your agents finish',
       },
       {
         property: 'og:description',
-        content: 'Stop watching terminals. Get instant push notifications when your AI agents, builds, or background tasks complete.',
+        content: 'Stop watching terminals. Get instant push notifications when your agents, builds, or background tasks complete.',
       },
       {
         property: 'og:image',
@@ -56,11 +56,11 @@ export const Route = createRootRoute({
       },
       {
         name: 'twitter:title',
-        content: 'finished.dev - Know when your AI agents finish',
+        content: 'finished.dev - know when your agents finish',
       },
       {
         name: 'twitter:description',
-        content: 'Stop watching terminals. Get instant push notifications when your AI agents, builds, or background tasks complete.',
+        content: 'Stop watching terminals. Get instant push notifications when your agents, builds, or background tasks complete.',
       },
       {
         name: 'twitter:image',

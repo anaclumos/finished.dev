@@ -1,10 +1,10 @@
 # finished.dev
 
-AI Agent Fleet Management - Get notified when your AI agents finish their tasks.
+Agent Fleet Management - Get notified when your agents finish their tasks.
 
 ## What is this?
 
-Stop watching terminals. **finished.dev** sends you instant push notifications when your AI agents, builds, or background tasks complete.
+Stop watching terminals. **finished.dev** sends you instant push notifications when your agents, builds, or background tasks complete.
 
 ```bash
 # Install the CLI
@@ -174,7 +174,7 @@ npm run build && finished ping "Build completed"
 # In a script
 python train.py && finished ping "Training finished" --duration $SECONDS
 
-# With AI agents
+# With agents
 claude "Review this code" && finished ping "Claude review done" --source claude
 ```
 

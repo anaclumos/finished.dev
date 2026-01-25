@@ -32,7 +32,7 @@ const features = [
     icon: Notification01Icon,
     title: 'Instant Push Notifications',
     description:
-      'Get browser notifications the moment your AI agents finish their work.',
+      'Get browser notifications the moment your agents finish their work.',
   },
   {
     icon: Clock01Icon,
@@ -47,7 +47,7 @@ const useCases = [
     icon: LaptopIcon,
     title: 'Long-running AI Tasks',
     description:
-      'Know when Claude, GPT, or your local LLM finishes a complex task.',
+      'know when Claude, GPT, or your local LLM finishes a complex task.',
   },
   {
     icon: CloudIcon,
@@ -59,7 +59,7 @@ const useCases = [
     icon: FlashIcon,
     title: 'Agent Workflows',
     description:
-      'Monitor multi-step AI agent workflows across multiple machines.',
+      'Monitor multi-step Agent workflows across multiple machines.',
   },
 ]
 
@@ -132,18 +132,18 @@ function LandingPage() {
                 size={14}
                 className="text-yellow-500"
               />
-              AI Agent Fleet Management
+              Agent Fleet Management
             </div>
 
             <h1 className="text-5xl font-semibold tracking-tight text-zinc-900 sm:text-6xl">
-              Know when your
+              know when your
               <br />
-              <span className="text-amber-400">AI agents finish</span>
+              <span className="text-amber-400">agents finish</span>
             </h1>
 
             <p className="mt-6 text-lg leading-relaxed text-zinc-600">
               Stop checking terminals. Get instant push notifications when your
-              AI agents, builds, or background tasks complete. One CLI command,
+              agents, builds, or background tasks complete. One CLI command,
               zero friction.
             </p>
 
@@ -400,7 +400,7 @@ function LandingPage() {
             Stop watching terminals
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
-            Let your AI agents notify you. to start, no credit card
+            Let your agents notify you. to start, no credit card
             required.
           </p>
           <div className="mt-10">

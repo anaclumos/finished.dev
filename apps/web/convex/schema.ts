@@ -26,7 +26,7 @@ export default defineSchema({
   // ============================================
 
   /**
-   * Agent Tasks - Records of completed AI agent tasks
+   * Agent Tasks - Records of completed Agent tasks
    * Created when CLI sends a webhook on task completion
    */
   agentTasks: defineTable({
