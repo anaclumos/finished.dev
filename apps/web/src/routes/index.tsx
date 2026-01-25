@@ -92,8 +92,8 @@ function LandingPage() {
               >
                 Sign In
               </Link>
-              <Link to="/sign-up">
-                <Button size="sm">Get Started</Button>
+              <Link to="/waitlist">
+                <Button size="sm">Waitlist</Button>
               </Link>
             </ClerkLoading>
             <ClerkLoaded>
@@ -104,8 +104,8 @@ function LandingPage() {
                 >
                   Sign In
                 </Link>
-                <Link to="/sign-up">
-                  <Button size="sm">Get Started</Button>
+                <Link to="/waitlist">
+                  <Button size="sm">Waitlist</Button>
                 </Link>
               </SignedOut>
               <SignedIn>
@@ -145,14 +145,14 @@ function LandingPage() {
 
             <div className="mt-10 flex items-center justify-center gap-4">
               <ClerkLoading>
-                <Link to="/sign-up">
-                  <Button size="lg">Get Started</Button>
+                <Link to="/waitlist">
+                  <Button size="lg">Waitlist</Button>
                 </Link>
               </ClerkLoading>
               <ClerkLoaded>
                 <SignedOut>
-                  <Link to="/sign-up">
-                    <Button size="lg">Get Started</Button>
+                  <Link to="/waitlist">
+                    <Button size="lg">Waitlist</Button>
                   </Link>
                 </SignedOut>
                 <SignedIn>
@@ -295,14 +295,14 @@ function LandingPage() {
 
               <div className="mt-10">
                 <ClerkLoading>
-                  <Link to="/sign-up">
-                    <Button>Get Started</Button>
+                  <Link to="/waitlist">
+                    <Button>Waitlist</Button>
                   </Link>
                 </ClerkLoading>
                 <ClerkLoaded>
                   <SignedOut>
-                    <Link to="/sign-up">
-                      <Button>Get Started</Button>
+                    <Link to="/waitlist">
+                      <Button>Waitlist</Button>
                     </Link>
                   </SignedOut>
                 </ClerkLoaded>
@@ -386,23 +386,23 @@ function LandingPage() {
           </p>
           <div className="mt-10">
             <ClerkLoading>
-              <Link to="/sign-up">
+              <Link to="/waitlist">
                 <Button
                   size="lg"
                   className="bg-white text-zinc-900 hover:bg-zinc-100"
                 >
-                  Get Started
+                  Waitlist
                 </Button>
               </Link>
             </ClerkLoading>
             <ClerkLoaded>
               <SignedOut>
-                <Link to="/sign-up">
+                <Link to="/waitlist">
                   <Button
                     size="lg"
                     className="bg-white text-zinc-900 hover:bg-zinc-100"
                   >
-                    Get Started
+                    Waitlist
                   </Button>
                 </Link>
               </SignedOut>
