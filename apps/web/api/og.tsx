@@ -1,7 +1,10 @@
 import { ImageResponse } from '@vercel/og'
-import { defineEventHandler } from 'h3'
 
-export default defineEventHandler(async () => {
+export const config = {
+  runtime: 'edge',
+}
+
+export default async function handler() {
   return new ImageResponse(
     (
       <div
@@ -173,4 +176,4 @@ export default defineEventHandler(async () => {
       height: 630,
     }
   )
-})
+}
