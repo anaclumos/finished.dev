@@ -18,7 +18,7 @@ interface Config {
 const HELP = `
 finished v${VERSION} - Agent Fleet Management CLI
 
-Get notified when your agents finish their tasks.
+Get Phone Push Notifications When Your Agents Finish Their Tasks.
 
 USAGE:
   finished <command> [options]

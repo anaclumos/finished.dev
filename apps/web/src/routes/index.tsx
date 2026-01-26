@@ -29,9 +29,9 @@ const features = [
   },
   {
     icon: Notification01Icon,
-    title: 'Instant Push Notifications',
+    title: 'Phone Push Notifications',
     description:
-      'Get browser notifications the moment your agents finish their work.',
+      'Get Phone and Browser Push Notifications the Moment Your Agents Finish Their Work.',
   },
   {
     icon: Clock01Icon,
@@ -93,7 +93,7 @@ function LandingPage() {
                 Sign In
               </Link>
               <Link to="/waitlist">
-                <Button size="sm">Waitlist</Button>
+                <Button size="sm">Join the Waitlist</Button>
               </Link>
             </ClerkLoading>
             <ClerkLoaded>
@@ -105,12 +105,12 @@ function LandingPage() {
                   Sign In
                 </Link>
                 <Link to="/waitlist">
-                  <Button size="sm">Waitlist</Button>
+                  <Button size="sm">Join the Waitlist</Button>
                 </Link>
               </SignedOut>
               <SignedIn>
                 <Link to="/dashboard">
-                  <Button size="sm">Dashboard</Button>
+                  <Button size="sm">Open Dashboard</Button>
                 </Link>
               </SignedIn>
             </ClerkLoaded>
@@ -132,32 +132,31 @@ function LandingPage() {
             </div>
 
             <h1 className="text-5xl font-semibold tracking-tight text-zinc-900 sm:text-6xl">
-              Know When Your
+              Phone Push Notifications
               <br />
-              <span className="text-amber-500">Agents Finish</span>
+              <span className="text-amber-500">When Agents Finish</span>
             </h1>
 
             <p className="mt-6 text-lg leading-relaxed text-zinc-600">
-              Stop checking terminals. Get instant push notifications when your
-              agents, builds, or background tasks complete. One CLI command,
-              zero friction.
+              Get Phone Push Notifications the Moment Your Agents, Builds, or
+              Background Tasks Complete. One CLI Command, Zero Friction.
             </p>
 
             <div className="mt-10 flex items-center justify-center gap-4">
               <ClerkLoading>
                 <Link to="/waitlist">
-                  <Button size="lg">Waitlist</Button>
+                  <Button size="lg">Join the Waitlist</Button>
                 </Link>
               </ClerkLoading>
               <ClerkLoaded>
                 <SignedOut>
                   <Link to="/waitlist">
-                    <Button size="lg">Waitlist</Button>
+                    <Button size="lg">Join the Waitlist</Button>
                   </Link>
                 </SignedOut>
                 <SignedIn>
                   <Link to="/dashboard">
-                    <Button size="lg">Go to Dashboard</Button>
+                    <Button size="lg">Open Dashboard</Button>
                   </Link>
                 </SignedIn>
               </ClerkLoaded>
@@ -295,17 +294,17 @@ function LandingPage() {
 
               <div className="mt-10">
                 <ClerkLoading>
+                <Link to="/waitlist">
+                  <Button>Join the Waitlist</Button>
+                </Link>
+              </ClerkLoading>
+              <ClerkLoaded>
+                <SignedOut>
                   <Link to="/waitlist">
-                    <Button>Waitlist</Button>
+                    <Button>Join the Waitlist</Button>
                   </Link>
-                </ClerkLoading>
-                <ClerkLoaded>
-                  <SignedOut>
-                    <Link to="/waitlist">
-                      <Button>Waitlist</Button>
-                    </Link>
-                  </SignedOut>
-                </ClerkLoaded>
+                </SignedOut>
+              </ClerkLoaded>
               </div>
             </div>
 
@@ -378,11 +377,11 @@ function LandingPage() {
       <section className="border-t border-zinc-100 bg-zinc-900 py-24">
         <div className="mx-auto max-w-7xl px-6 text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-white">
-            Stop Watching Terminals
+            Get Phone Push Alerts When Agents Finish
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
-            Let your agents notify you. to start, no credit card
-            required.
+            Join the Waitlist for Phone Push Alerts the Moment Your Work
+            Completes. No Credit Card Required.
           </p>
           <div className="mt-10">
             <ClerkLoading>
@@ -391,7 +390,7 @@ function LandingPage() {
                   size="lg"
                   className="bg-white text-zinc-900 hover:bg-zinc-100"
                 >
-                  Waitlist
+                  Join the Waitlist
                 </Button>
               </Link>
             </ClerkLoading>
@@ -402,7 +401,7 @@ function LandingPage() {
                     size="lg"
                     className="bg-white text-zinc-900 hover:bg-zinc-100"
                   >
-                    Waitlist
+                    Join the Waitlist
                   </Button>
                 </Link>
               </SignedOut>
@@ -412,7 +411,7 @@ function LandingPage() {
                     size="lg"
                     className="bg-white text-zinc-900 hover:bg-zinc-100"
                   >
-                    Go to Dashboard
+                    Open Dashboard
                   </Button>
                 </Link>
               </SignedIn>

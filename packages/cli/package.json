@@ -1,7 +1,7 @@
 {
   "name": "@finished/cli",
   "version": "0.2.0",
-  "description": "Agent Fleet Management CLI - Get notified when your agents finish tasks",
+  "description": "Agent Fleet Management CLI - Phone Push Notifications When Agents Finish Tasks",
   "type": "module",
   "bin": {
     "finished": "./src/index.ts"
