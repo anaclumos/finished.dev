@@ -135,7 +135,7 @@ export default defineEventHandler(async (event) => {
               lineHeight: 1.2,
             }}
           >
-            Know When Your
+            Phone Push Notifications
           </div>
           <div
             style={{
@@ -146,7 +146,7 @@ export default defineEventHandler(async (event) => {
               lineHeight: 1.2,
             }}
           >
-            Agents Finish
+            When Agents Finish
           </div>
         </div>
       </div>
@@ -165,7 +165,7 @@ export default defineEventHandler(async (event) => {
             color: '#fde68a',
           }}
         >
-          Stop watching terminals. Get instant push notifications.
+          Phone Push Notifications the Moment Agents Finish.
         </span>
       </div>
     </div>,

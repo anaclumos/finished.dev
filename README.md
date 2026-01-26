@@ -1,10 +1,10 @@
 # finished.dev
 
-Agent Fleet Management - Get notified when your agents finish their tasks.
+Agent Fleet Management - Phone Push Notifications When Agents Finish.
 
 ## What is this?
 
-Stop watching terminals. **finished.dev** sends you instant push notifications when your agents, builds, or background tasks complete.
+Get Phone Push Notifications the Moment Your Agents, Builds, or Background Tasks Complete.
 
 ```bash
 # Install the CLI
