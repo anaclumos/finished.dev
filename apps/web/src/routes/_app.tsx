@@ -15,8 +15,8 @@ import {
   isPushSupported,
 } from '@/lib/push'
 
-export const Route = createFileRoute('/dashboard')({
-  component: DashboardLayout,
+export const Route = createFileRoute('/_app')({
+  component: AppLayout,
 })
 
 const navigation = [
@@ -24,7 +24,7 @@ const navigation = [
   { name: 'Settings', href: '/settings', icon: Settings01Icon },
 ]
 
-function DashboardLayout() {
+function AppLayout() {
   const { isAuthenticated, isLoading } = useConvexAuth()
   const { user } = useUser()
   const navigate = useNavigate()

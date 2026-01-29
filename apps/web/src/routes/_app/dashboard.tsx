@@ -15,7 +15,7 @@ import {
   Activity01Icon,
 } from '@hugeicons/core-free-icons'
 
-export const Route = createFileRoute('/dashboard/')({
+export const Route = createFileRoute('/_app/dashboard')({
   component: DashboardPage,
 })
 

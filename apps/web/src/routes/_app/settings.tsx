@@ -27,7 +27,7 @@ import {
   extractSubscriptionKeys,
 } from '@/lib/push'
 
-export const Route = createFileRoute('/settings')({
+export const Route = createFileRoute('/_app/settings')({
   component: SettingsPage,
 })
 
@@ -233,7 +233,7 @@ function SettingsPage() {
         )}
 
         <div className="space-y-8">
-          <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+          <section className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all duration-200 hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-200/50">
             <div className="p-6">
               <SectionHeader
                 icon={Key01Icon}
@@ -317,7 +317,7 @@ function SettingsPage() {
             </div>
           </section>
 
-          <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+          <section className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all duration-200 hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-200/50">
             <div className="p-6">
               <SectionHeader
                 icon={Notification01Icon}
@@ -448,7 +448,7 @@ function SettingsPage() {
             </div>
           </section>
 
-          <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+          <section className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all duration-200 hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-200/50">
             <div className="p-6">
               <SectionHeader
                 icon={CommandIcon}
