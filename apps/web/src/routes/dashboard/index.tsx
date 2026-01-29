@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from 'convex/react'
 import { api } from '@convex/_generated/api'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
@@ -9,6 +8,11 @@ import {
   Cancel01Icon,
   AlertCircleIcon,
   Clock01Icon,
+  FlashIcon,
+  ArrowUp01Icon,
+  ArrowDown01Icon,
+  CommandIcon,
+  Activity01Icon,
 } from '@hugeicons/core-free-icons'
 
 export const Route = createFileRoute('/dashboard/')({
@@ -40,22 +44,214 @@ function formatDuration(ms: number): string {
 const statusConfig = {
   success: {
     icon: CheckmarkCircle02Icon,
-    color: 'text-green-600',
-    bg: 'bg-green-50',
+    color: 'text-emerald-600',
+    bg: 'bg-emerald-500/10',
+    ringColor: 'ring-emerald-500/20',
     label: 'Success',
+    badgeClass: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
   },
   failure: {
     icon: Cancel01Icon,
     color: 'text-red-600',
-    bg: 'bg-red-50',
+    bg: 'bg-red-500/10',
+    ringColor: 'ring-red-500/20',
     label: 'Failed',
+    badgeClass: 'bg-red-500/10 text-red-600 border-red-500/20',
   },
   cancelled: {
     icon: AlertCircleIcon,
     color: 'text-amber-600',
-    bg: 'bg-amber-50',
+    bg: 'bg-amber-500/10',
+    ringColor: 'ring-amber-500/20',
     label: 'Cancelled',
+    badgeClass: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
   },
+}
+
+function StatCard({
+  title,
+  value,
+  icon,
+  trend,
+  trendValue,
+  accentColor = 'zinc',
+}: {
+  title: string
+  value: number | string
+  icon: typeof FlashIcon
+  trend?: 'up' | 'down' | 'neutral'
+  trendValue?: string
+  accentColor?: 'zinc' | 'emerald' | 'red' | 'amber'
+}) {
+  const colorClasses = {
+    zinc: {
+      iconBg: 'bg-zinc-100',
+      iconColor: 'text-zinc-600',
+      valueColor: 'text-zinc-900',
+    },
+    emerald: {
+      iconBg: 'bg-emerald-500/10',
+      iconColor: 'text-emerald-600',
+      valueColor: 'text-emerald-600',
+    },
+    red: {
+      iconBg: 'bg-red-500/10',
+      iconColor: 'text-red-600',
+      valueColor: 'text-red-600',
+    },
+    amber: {
+      iconBg: 'bg-amber-500/10',
+      iconColor: 'text-amber-600',
+      valueColor: 'text-amber-600',
+    },
+  }
+
+  const colors = colorClasses[accentColor]
+
+  return (
+    <div className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white p-6 transition-all duration-200 hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-200/50">
+      <div className="flex items-start justify-between">
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-zinc-500">{title}</p>
+          <p className={`text-3xl font-semibold tracking-tight ${colors.valueColor}`}>
+            {value}
+          </p>
+          {trend && trendValue && (
+            <div className="flex items-center gap-1.5">
+              {trend === 'up' && (
+                <span className="flex items-center gap-0.5 text-xs font-medium text-emerald-600">
+                  <HugeiconsIcon icon={ArrowUp01Icon} size={12} />
+                  {trendValue}
+                </span>
+              )}
+              {trend === 'down' && (
+                <span className="flex items-center gap-0.5 text-xs font-medium text-red-600">
+                  <HugeiconsIcon icon={ArrowDown01Icon} size={12} />
+                  {trendValue}
+                </span>
+              )}
+              <span className="text-xs text-zinc-400">vs last week</span>
+            </div>
+          )}
+        </div>
+        <div className={`rounded-xl p-3 ${colors.iconBg}`}>
+          <HugeiconsIcon icon={icon} size={20} className={colors.iconColor} />
+        </div>
+      </div>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-zinc-50/50 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+    </div>
+  )
+}
+
+function TaskRow({
+  task,
+}: {
+  task: {
+    _id: string
+    title: string
+    status: string
+    createdAt: number
+    source?: string
+    duration?: number
+  }
+}) {
+  const config = statusConfig[task.status as keyof typeof statusConfig] || statusConfig.success
+
+  return (
+    <div className="group flex items-center gap-4 rounded-xl px-4 py-4 transition-all duration-150 hover:bg-zinc-50">
+      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${config.bg} ring-1 ${config.ringColor}`}>
+        <HugeiconsIcon icon={config.icon} size={18} className={config.color} />
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-medium text-zinc-900 group-hover:text-zinc-700">
+          {task.title}
+        </p>
+        <div className="mt-1 flex items-center gap-2 text-sm text-zinc-500">
+          <span>{formatRelativeTime(task.createdAt)}</span>
+          {task.source && (
+            <>
+              <span className="text-zinc-300">·</span>
+              <span className="inline-flex items-center gap-1">
+                <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs text-zinc-600">
+                  {task.source}
+                </span>
+              </span>
+            </>
+          )}
+          {task.duration && (
+            <>
+              <span className="text-zinc-300">·</span>
+              <span className="inline-flex items-center gap-1 text-zinc-400">
+                <HugeiconsIcon icon={Clock01Icon} size={12} />
+                {formatDuration(task.duration)}
+              </span>
+            </>
+          )}
+        </div>
+      </div>
+
+      <Badge className={`shrink-0 border ${config.badgeClass}`}>
+        {config.label}
+      </Badge>
+    </div>
+  )
+}
+
+function EmptyState() {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 text-center">
+      <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-100">
+        <HugeiconsIcon icon={CommandIcon} size={28} className="text-zinc-400" />
+      </div>
+      <h3 className="text-lg font-semibold text-zinc-900">No tasks yet</h3>
+      <p className="mt-2 max-w-sm text-sm text-zinc-500">
+        Set up the CLI to start receiving task notifications. It only takes a minute.
+      </p>
+      <div className="mt-8 w-full max-w-md overflow-hidden rounded-xl border border-zinc-200 bg-zinc-900 text-left">
+        <div className="flex items-center gap-2 border-b border-zinc-800 px-4 py-3">
+          <div className="h-3 w-3 rounded-full bg-red-500/80" />
+          <div className="h-3 w-3 rounded-full bg-yellow-500/80" />
+          <div className="h-3 w-3 rounded-full bg-green-500/80" />
+          <span className="ml-2 text-xs text-zinc-500">Terminal</span>
+        </div>
+        <div className="space-y-3 p-4 font-mono text-sm">
+          <div>
+            <span className="text-zinc-500"># Install the CLI</span>
+          </div>
+          <div className="text-zinc-100">
+            <span className="text-emerald-400">$</span> bun install -g @finished/cli
+          </div>
+          <div className="mt-4">
+            <span className="text-zinc-500"># Configure your API key</span>
+          </div>
+          <div className="text-zinc-100">
+            <span className="text-emerald-400">$</span> finished init
+          </div>
+          <div className="mt-4">
+            <span className="text-zinc-500"># Send your first notification</span>
+          </div>
+          <div className="text-zinc-100">
+            <span className="text-emerald-400">$</span> finished ping "Hello World"
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function LoadingState() {
+  return (
+    <div className="flex flex-col items-center justify-center py-16">
+      <div className="relative">
+        <div className="h-12 w-12 animate-spin rounded-full border-[3px] border-zinc-200 border-t-zinc-900" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <HugeiconsIcon icon={Activity01Icon} size={16} className="text-zinc-400" />
+        </div>
+      </div>
+      <p className="mt-4 text-sm text-zinc-500">Loading tasks...</p>
+    </div>
+  )
 }
 
 function DashboardPage() {
@@ -64,129 +260,115 @@ function DashboardPage() {
 
   const stats = {
     total: taskCount ?? 0,
-    today:
-      tasks?.filter((t) => t.createdAt > Date.now() - 24 * 60 * 60 * 1000).length ?? 0,
+    today: tasks?.filter((t) => t.createdAt > Date.now() - 24 * 60 * 60 * 1000).length ?? 0,
     success: tasks?.filter((t) => t.status === 'success').length ?? 0,
     failed: tasks?.filter((t) => t.status === 'failure').length ?? 0,
   }
 
+  const successRate = stats.total > 0 ? Math.round((stats.success / stats.total) * 100) : 0
+
   return (
-    <div className="p-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-zinc-900">Dashboard</h1>
-        <p className="mt-1 text-sm text-zinc-600">
-          Monitor your Agent task completions in real-time.
-        </p>
-      </div>
-
-      {/* Stats */}
-      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-zinc-900">{stats.total}</div>
-            <div className="text-sm text-zinc-600">Total Tasks</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-zinc-900">{stats.today}</div>
-            <div className="text-sm text-zinc-600">Today</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-green-600">{stats.success}</div>
-            <div className="text-sm text-zinc-600">Successful</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-red-600">{stats.failed}</div>
-            <div className="text-sm text-zinc-600">Failed</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Task Feed */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Tasks</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {tasks === undefined ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900" />
+    <div className="min-h-screen bg-zinc-50/50 p-8">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-8">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-900">
+              <HugeiconsIcon icon={Activity01Icon} size={20} className="text-white" />
             </div>
-          ) : tasks.length === 0 ? (
-            <div className="py-12 text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100">
-                <HugeiconsIcon icon={Clock01Icon} size={24} className="text-zinc-400" />
-              </div>
-              <h3 className="text-lg font-medium text-zinc-900">No tasks yet</h3>
-              <p className="mt-1 text-sm text-zinc-600">
-                Set up the CLI to start receiving task notifications.
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Dashboard</h1>
+              <p className="text-sm text-zinc-500">
+                Monitor your agent task completions in real-time
               </p>
-              <div className="mt-4 rounded-lg bg-zinc-50 p-4 text-left font-mono text-sm">
-                <div className="text-zinc-500"># Install the CLI</div>
-                <div className="text-zinc-900">bun install -g @finished/cli</div>
-                <div className="mt-2 text-zinc-500"># Configure your API key</div>
-                <div className="text-zinc-900">finished init</div>
-                <div className="mt-2 text-zinc-500"># Send your first notification</div>
-                <div className="text-zinc-900">finished ping "Hello World"</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            title="Total Tasks"
+            value={stats.total}
+            icon={FlashIcon}
+            accentColor="zinc"
+          />
+          <StatCard
+            title="Today"
+            value={stats.today}
+            icon={Clock01Icon}
+            accentColor="amber"
+          />
+          <StatCard
+            title="Successful"
+            value={stats.success}
+            icon={CheckmarkCircle02Icon}
+            accentColor="emerald"
+          />
+          <StatCard
+            title="Failed"
+            value={stats.failed}
+            icon={Cancel01Icon}
+            accentColor="red"
+          />
+        </div>
+
+        {stats.total > 0 && (
+          <div className="mb-8 overflow-hidden rounded-2xl border border-zinc-200 bg-gradient-to-r from-zinc-900 to-zinc-800 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-zinc-400">Success Rate</p>
+                <p className="mt-1 text-4xl font-bold text-white">{successRate}%</p>
+              </div>
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10">
+                <HugeiconsIcon icon={CheckmarkCircle02Icon} size={32} className="text-emerald-400" />
               </div>
             </div>
-          ) : (
-            <div className="divide-y divide-zinc-100">
-              {tasks.map((task) => {
-                const config = statusConfig[task.status as keyof typeof statusConfig] ||
-                  statusConfig.success
-
-                return (
-                  <div
-                    key={task._id}
-                    className="flex items-center justify-between py-4 first:pt-0 last:pb-0"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`rounded-full p-2 ${config.bg}`}>
-                        <HugeiconsIcon
-                          icon={config.icon}
-                          size={16}
-                          className={config.color}
-                        />
-                      </div>
-                      <div>
-                        <div className="font-medium text-zinc-900">{task.title}</div>
-                        <div className="flex items-center gap-2 text-sm text-zinc-500">
-                          <span>{formatRelativeTime(task.createdAt)}</span>
-                          {task.source && (
-                            <>
-                              <span>·</span>
-                              <span>{task.source}</span>
-                            </>
-                          )}
-                          {task.duration && (
-                            <>
-                              <span>·</span>
-                              <span>{formatDuration(task.duration)}</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <Badge
-                      variant="outline"
-                      className={`border-current ${config.color}`}
-                    >
-                      {config.label}
-                    </Badge>
-                  </div>
-                )
-              })}
+            <div className="mt-4">
+              <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-500"
+                  style={{ width: `${successRate}%` }}
+                />
+              </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        )}
+
+        <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+          <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-4">
+            <div className="flex items-center gap-3">
+              <h2 className="text-lg font-semibold text-zinc-900">Recent Tasks</h2>
+              {tasks && tasks.length > 0 && (
+                <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600">
+                  {tasks.length}
+                </span>
+              )}
+            </div>
+            {tasks && tasks.length > 0 && (
+              <div className="flex items-center gap-1.5">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                </span>
+                <span className="text-xs font-medium text-zinc-500">Live</span>
+              </div>
+            )}
+          </div>
+
+          <div className="divide-y divide-zinc-100">
+            {tasks === undefined ? (
+              <LoadingState />
+            ) : tasks.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <div className="max-h-[600px] overflow-y-auto">
+                {tasks.map((task) => (
+                  <TaskRow key={task._id} task={task} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
