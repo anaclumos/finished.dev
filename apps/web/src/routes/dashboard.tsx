@@ -21,7 +21,7 @@ export const Route = createFileRoute('/dashboard')({
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: DashboardSquare01Icon },
-  { name: 'Settings', href: '/dashboard/settings', icon: Settings01Icon },
+  { name: 'Settings', href: '/settings', icon: Settings01Icon },
 ]
 
 function DashboardLayout() {

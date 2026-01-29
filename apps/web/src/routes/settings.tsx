@@ -30,7 +30,7 @@ import {
   extractSubscriptionKeys,
 } from '@/lib/push'
 
-export const Route = createFileRoute('/dashboard/settings')({
+export const Route = createFileRoute('/settings')({
   component: SettingsPage,
 })
 

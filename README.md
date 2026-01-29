@@ -228,7 +228,7 @@ Content-Type: application/json
 | `/sign-in` | Sign in |
 | `/sign-up` | Sign up |
 | `/dashboard` | Task feed |
-| `/dashboard/settings` | API keys & settings |
+| `/settings` | API keys & settings |
 
 ## Development Notes
 
