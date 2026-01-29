@@ -6,7 +6,6 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import {
   DashboardSquare01Icon,
   Settings01Icon,
-  Notification01Icon,
 } from '@hugeicons/core-free-icons'
 import { useEffect } from 'react'
 import {
@@ -73,11 +72,8 @@ function AppLayout() {
       {/* Sidebar */}
       <aside className="fixed inset-y-0 left-0 z-50 w-64 border-r border-zinc-200 bg-white">
         <div className="flex h-full flex-col">
-          {/* Logo */}
           <div className="flex h-14 items-center gap-2 border-b border-zinc-200 px-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900 text-white">
-              <HugeiconsIcon icon={Notification01Icon} size={18} />
-            </div>
+            <img src="/logo.png" alt="finished.dev" className="h-8 w-8" />
             <span className="font-semibold text-zinc-900">finished.dev</span>
           </div>
 
