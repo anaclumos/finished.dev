@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, Link, useNavigate } from '@tanstack/react-router'
-import { useConvexAuth } from 'convex/react'
+import { useConvexAuth, useMutation } from 'convex/react'
+import { api } from '@convex/_generated/api'
 import { useUser, UserButton } from '@clerk/clerk-react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
@@ -7,6 +8,12 @@ import {
   Settings01Icon,
   Notification01Icon,
 } from '@hugeicons/core-free-icons'
+import { useEffect } from 'react'
+import {
+  initializePush,
+  extractSubscriptionKeys,
+  isPushSupported,
+} from '@/lib/push'
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardLayout,
@@ -21,6 +28,32 @@ function DashboardLayout() {
   const { isAuthenticated, isLoading } = useConvexAuth()
   const { user } = useUser()
   const navigate = useNavigate()
+  const upsertSubscription = useMutation(api.pushSubscriptions.upsertSubscription)
+
+  useEffect(() => {
+    if (!isAuthenticated || isLoading) return
+
+    const setupPush = async () => {
+      if (!isPushSupported()) return
+
+      try {
+        const subscription = await initializePush()
+        if (subscription) {
+          const keys = extractSubscriptionKeys(subscription)
+          await upsertSubscription({
+            endpoint: keys.endpoint,
+            p256dh: keys.p256dh,
+            auth: keys.auth,
+            userAgent: navigator.userAgent,
+          })
+        }
+      } catch (error) {
+        console.error('[Push] Setup failed:', error)
+      }
+    }
+
+    setupPush()
+  }, [isAuthenticated, isLoading, upsertSubscription])
 
   if (isLoading) {
     return (

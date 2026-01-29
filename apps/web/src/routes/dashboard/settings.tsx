@@ -18,8 +18,17 @@ import {
   Delete02Icon,
   Copy01Icon,
   CheckmarkCircle02Icon,
+  Notification01Icon,
+  Cancel01Icon,
+  AlertCircleIcon,
 } from '@hugeicons/core-free-icons'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import {
+  isPushSupported,
+  getPermissionStatus,
+  subscribeToPush,
+  extractSubscriptionKeys,
+} from '@/lib/push'
 
 export const Route = createFileRoute('/dashboard/settings')({
   component: SettingsPage,
@@ -31,11 +40,46 @@ function SettingsPage() {
   const deleteApiKey = useMutation(api.apiKeys.remove)
   const settings = useQuery(api.userSettings.get, {})
   const updateSettings = useMutation(api.userSettings.update)
+  const upsertSubscription = useMutation(api.pushSubscriptions.upsertSubscription)
 
   const [keyName, setKeyName] = useState('')
   const [creating, setCreating] = useState(false)
   const [newKey, setNewKey] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [pushStatus, setPushStatus] = useState<'loading' | 'unsupported' | 'denied' | 'granted' | 'default'>('loading')
+  const [subscribing, setSubscribing] = useState(false)
+
+  useEffect(() => {
+    if (!isPushSupported()) {
+      setPushStatus('unsupported')
+      return
+    }
+    setPushStatus(getPermissionStatus())
+  }, [])
+
+  const handleEnableNotifications = async () => {
+    setSubscribing(true)
+    try {
+      const subscription = await subscribeToPush()
+      if (subscription) {
+        const keys = extractSubscriptionKeys(subscription)
+        await upsertSubscription({
+          endpoint: keys.endpoint,
+          p256dh: keys.p256dh,
+          auth: keys.auth,
+          userAgent: navigator.userAgent,
+        })
+        setPushStatus('granted')
+      } else {
+        setPushStatus(getPermissionStatus())
+      }
+    } catch (error) {
+      console.error('Failed to enable notifications:', error)
+      setPushStatus(getPermissionStatus())
+    } finally {
+      setSubscribing(false)
+    }
+  }
 
   const handleCreateKey = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -208,41 +252,109 @@ function SettingsPage() {
       {/* Notification Settings */}
       <Card>
         <CardHeader>
-          <CardTitle>Notifications</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <HugeiconsIcon icon={Notification01Icon} size={20} />
+            Notifications
+          </CardTitle>
           <CardDescription>
             Configure how you receive task completion notifications.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <label className="flex items-center justify-between">
-              <div>
-                <div className="font-medium text-zinc-900">Push Notifications</div>
-                <div className="text-sm text-zinc-500">
-                  Receive browser notifications when tasks complete
+          <div className="space-y-6">
+            <div className="rounded-lg border border-zinc-200 p-4">
+              {pushStatus === 'loading' ? (
+                <div className="flex items-center gap-3">
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900" />
+                  <span className="text-sm text-zinc-600">Checking notification status...</span>
                 </div>
-              </div>
-              <input
-                type="checkbox"
-                checked={settings?.pushEnabled ?? true}
-                onChange={(e) => updateSettings({ pushEnabled: e.target.checked })}
-                className="h-5 w-5 rounded border-zinc-300"
-              />
-            </label>
-            <label className="flex items-center justify-between">
-              <div>
-                <div className="font-medium text-zinc-900">Sound</div>
-                <div className="text-sm text-zinc-500">
-                  Play a sound when notifications arrive
+              ) : pushStatus === 'unsupported' ? (
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100">
+                    <HugeiconsIcon icon={Cancel01Icon} size={16} className="text-zinc-500" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-zinc-900">Not Supported</div>
+                    <div className="text-sm text-zinc-500">
+                      Push notifications are not supported in this browser.
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <input
-                type="checkbox"
-                checked={settings?.soundEnabled ?? true}
-                onChange={(e) => updateSettings({ soundEnabled: e.target.checked })}
-                className="h-5 w-5 rounded border-zinc-300"
-              />
-            </label>
+              ) : pushStatus === 'denied' ? (
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100">
+                    <HugeiconsIcon icon={Cancel01Icon} size={16} className="text-red-600" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-zinc-900">Notifications Blocked</div>
+                    <div className="text-sm text-zinc-500">
+                      Please enable notifications in your browser settings.
+                    </div>
+                  </div>
+                </div>
+              ) : pushStatus === 'granted' ? (
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
+                    <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} className="text-green-600" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-zinc-900">Notifications Enabled</div>
+                    <div className="text-sm text-zinc-500">
+                      You will receive push notifications when tasks complete.
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
+                      <HugeiconsIcon icon={AlertCircleIcon} size={16} className="text-amber-600" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-zinc-900">Enable Notifications</div>
+                      <div className="text-sm text-zinc-500">
+                        Get notified when your tasks complete.
+                      </div>
+                    </div>
+                  </div>
+                  <Button onClick={handleEnableNotifications} disabled={subscribing}>
+                    {subscribing ? 'Enabling...' : 'Enable'}
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <label className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium text-zinc-900">Push Notifications</div>
+                  <div className="text-sm text-zinc-500">
+                    Receive browser notifications when tasks complete
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settings?.pushEnabled ?? true}
+                  onChange={(e) => updateSettings({ pushEnabled: e.target.checked })}
+                  className="h-5 w-5 rounded border-zinc-300"
+                  disabled={pushStatus !== 'granted'}
+                />
+              </label>
+              <label className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium text-zinc-900">Sound</div>
+                  <div className="text-sm text-zinc-500">
+                    Play a sound when notifications arrive
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settings?.soundEnabled ?? true}
+                  onChange={(e) => updateSettings({ soundEnabled: e.target.checked })}
+                  className="h-5 w-5 rounded border-zinc-300"
+                />
+              </label>
+            </div>
           </div>
         </CardContent>
       </Card>
