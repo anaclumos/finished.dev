@@ -18,5 +18,9 @@
   },
   "devDependencies": {
     "turbo": "^2.8.1"
-  }
+  },
+  "trustedDependencies": [
+    "@clerk/shared",
+    "unrs-resolver"
+  ]
 }
