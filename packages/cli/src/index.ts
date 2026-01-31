@@ -221,14 +221,14 @@ async function ping(
       })
 
       if (response.ok) {
-        const result = await response.json()
-        console.log(`✅ ${message}`)
-        return
-      }
+         await response.json()
+         console.log(`✅ ${message}`)
+         return
+       }
 
-      const error = await response.json().catch(() => ({}))
-      if (response.status === 401) {
-        console.error(`❌ Authentication failed: ${error.error || 'Invalid API key'}`)
+       const error = await response.json().catch(() => ({})) as Record<string, unknown>
+       if (response.status === 401) {
+         console.error(`❌ Authentication failed: ${error.error || 'Invalid API key'}`)
         console.error('   Run "finished init" to reconfigure')
         process.exit(1)
       }
@@ -291,13 +291,13 @@ async function testConnection(): Promise<void> {
       }),
     })
 
-    if (testResponse.ok) {
-      console.log('✅ API key is valid')
-      console.log('✅ Test notification sent!')
-      console.log('\n🎉 Everything is working! You should receive a push notification.')
-    } else {
-      const error = await testResponse.json().catch(() => ({}))
-      console.error('❌ API key validation failed:', error.error || testResponse.statusText)
+     if (testResponse.ok) {
+       console.log('✅ API key is valid')
+       console.log('✅ Test notification sent!')
+       console.log('\n🎉 Everything is working! You should receive a push notification.')
+     } else {
+       const error = await testResponse.json().catch(() => ({})) as Record<string, unknown>
+       console.error('❌ API key validation failed:', error.error || testResponse.statusText)
       process.exit(1)
     }
   } catch (error) {
