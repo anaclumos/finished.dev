@@ -198,20 +198,23 @@ async function ping(
     process.exit(1)
   }
 
-  const payload = {
+  const payload: Record<string, any> = {
     title: message,
     status: options.status,
-    source: options.source,
-    duration: options.duration,
     machineId: config.machineId,
   }
+
+  // Only include optional fields if they have values
+  if (options.source) payload.source = options.source
+  if (options.duration) payload.duration = options.duration
 
   const maxRetries = 3
   const backoffMs = 1000
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const response = await fetch(`${config.serverUrl}/api/webhook/task`, {
+       const url = `${config.serverUrl}/api/webhook/task`
+       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -220,14 +223,14 @@ async function ping(
         body: JSON.stringify(payload),
       })
 
-      if (response.ok) {
+       if (response.ok) {
          await response.json()
          console.log(`✅ ${message}`)
          return
        }
 
-       const error = await response.json().catch(() => ({})) as Record<string, unknown>
-       if (response.status === 401) {
+        const error = await response.json().catch(() => ({})) as Record<string, unknown>
+        if (response.status === 401) {
          console.error(`❌ Authentication failed: ${error.error || 'Invalid API key'}`)
         console.error('   Run "finished init" to reconfigure')
         process.exit(1)
