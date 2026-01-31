@@ -202,7 +202,7 @@ async function ping(
     process.exit(1)
   }
 
-  const payload: Record<string, any> = {
+  const payload: Record<string, string | number | undefined> = {
     title: message,
     status: options.status,
     machineId: config.machineId,

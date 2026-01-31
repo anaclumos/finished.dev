@@ -1,4 +1,5 @@
 import { api } from '@convex/_generated/api'
+import type { Id } from '@convex/_generated/dataModel'
 import {
   AlertCircleIcon,
   Cancel01Icon,
@@ -82,6 +83,199 @@ function ToggleSwitch({
   )
 }
 
+interface ApiKey {
+  _id: Id<'apiKeys'>
+  name: string
+  keyPrefix: string
+  createdAt: number
+  lastUsedAt?: number
+}
+
+function ApiKeysList({
+  apiKeys,
+  formatDate,
+  onDeleteKey,
+}: {
+  apiKeys: ApiKey[] | undefined
+  formatDate: (timestamp: number) => string
+  onDeleteKey: (id: Id<'apiKeys'>) => void
+}) {
+  if (apiKeys === undefined) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-zinc-200 border-t-zinc-900" />
+      </div>
+    )
+  }
+
+  if (apiKeys.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100">
+          <HugeiconsIcon
+            className="text-zinc-400"
+            icon={ShieldKeyIcon}
+            size={24}
+          />
+        </div>
+        <p className="font-medium text-zinc-900">No API keys yet</p>
+        <p className="mt-1 text-sm text-zinc-500">
+          Create one to start using the CLI
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="divide-y divide-zinc-100">
+      {apiKeys.map((key) => (
+        <div
+          className="group flex items-center justify-between py-4 first:pt-0 last:pb-0"
+          key={key._id}
+        >
+          <div className="min-w-0 flex-1">
+            <p className="font-medium text-zinc-900">{key.name}</p>
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500">
+              <code className="rounded-md bg-zinc-100 px-2 py-0.5 font-mono text-xs text-zinc-600">
+                {key.keyPrefix}...
+              </code>
+              <span className="text-zinc-300">·</span>
+              <span>Created {formatDate(key.createdAt)}</span>
+              {key.lastUsedAt && (
+                <>
+                  <span className="text-zinc-300">·</span>
+                  <span className="text-emerald-600">
+                    Last used {formatDate(key.lastUsedAt)}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+          <Button
+            className="ml-4 text-zinc-400 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
+            onClick={() => onDeleteKey(key._id)}
+            size="sm"
+            variant="ghost"
+          >
+            <HugeiconsIcon icon={Delete02Icon} size={16} />
+            Delete
+          </Button>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+type PushStatus = 'loading' | 'unsupported' | 'denied' | 'granted' | 'default'
+
+function PushStatusBanner({
+  status,
+  subscribing,
+  onEnableClick,
+}: {
+  status: PushStatus
+  subscribing: boolean
+  onEnableClick: () => void
+}) {
+  if (status === 'loading') {
+    return (
+      <div className="flex items-center gap-4 p-4">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-900" />
+        <span className="text-sm text-zinc-600">
+          Checking notification status...
+        </span>
+      </div>
+    )
+  }
+
+  if (status === 'unsupported') {
+    return (
+      <div className="flex items-center gap-4 bg-zinc-50 p-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-200">
+          <HugeiconsIcon
+            className="text-zinc-500"
+            icon={Cancel01Icon}
+            size={18}
+          />
+        </div>
+        <div>
+          <p className="font-medium text-zinc-900">Not Supported</p>
+          <p className="text-sm text-zinc-500">
+            Push notifications are not supported in this browser
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (status === 'denied') {
+    return (
+      <div className="flex items-center gap-4 bg-red-50 p-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100">
+          <HugeiconsIcon
+            className="text-red-600"
+            icon={Cancel01Icon}
+            size={18}
+          />
+        </div>
+        <div>
+          <p className="font-medium text-zinc-900">Notifications Blocked</p>
+          <p className="text-sm text-zinc-500">
+            Please enable notifications in your browser settings
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (status === 'granted') {
+    return (
+      <div className="flex items-center gap-4 bg-emerald-50 p-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100">
+          <HugeiconsIcon
+            className="text-emerald-600"
+            icon={CheckmarkCircle02Icon}
+            size={18}
+          />
+        </div>
+        <div>
+          <p className="font-medium text-zinc-900">Notifications Enabled</p>
+          <p className="text-sm text-zinc-500">
+            You will receive push notifications when tasks complete
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex items-center justify-between bg-amber-50 p-4">
+      <div className="flex items-center gap-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100">
+          <HugeiconsIcon
+            className="text-amber-600"
+            icon={AlertCircleIcon}
+            size={18}
+          />
+        </div>
+        <div>
+          <p className="font-medium text-zinc-900">Enable Notifications</p>
+          <p className="text-sm text-zinc-500">
+            Get notified when your tasks complete
+          </p>
+        </div>
+      </div>
+      <Button
+        className="rounded-xl bg-zinc-900 hover:bg-zinc-800"
+        disabled={subscribing}
+        onClick={onEnableClick}
+      >
+        {subscribing ? 'Enabling...' : 'Enable'}
+      </Button>
+    </div>
+  )
+}
+
 function SettingsPage() {
   const apiKeys = useQuery(api.apiKeys.list, {})
   const createApiKey = useMutation(api.apiKeys.create)
@@ -160,12 +354,11 @@ function SettingsPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleDeleteKey = async (id: any) => {
-    if (
-      !confirm(
-        'Are you sure you want to delete this API key? This cannot be undone.'
-      )
-    ) {
+  const handleDeleteKey = async (id: Id<'apiKeys'>) => {
+    const confirmed = globalThis.confirm(
+      'Are you sure you want to delete this API key? This cannot be undone.'
+    )
+    if (!confirmed) {
       return
     }
     try {
@@ -285,64 +478,11 @@ function SettingsPage() {
               </form>
 
               <div className="mt-6">
-                {apiKeys === undefined ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-zinc-200 border-t-zinc-900" />
-                  </div>
-                ) : apiKeys.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100">
-                      <HugeiconsIcon
-                        className="text-zinc-400"
-                        icon={ShieldKeyIcon}
-                        size={24}
-                      />
-                    </div>
-                    <p className="font-medium text-zinc-900">No API keys yet</p>
-                    <p className="mt-1 text-sm text-zinc-500">
-                      Create one to start using the CLI
-                    </p>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-zinc-100">
-                    {apiKeys.map((key) => (
-                      <div
-                        className="group flex items-center justify-between py-4 first:pt-0 last:pb-0"
-                        key={key._id}
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-zinc-900">
-                            {key.name}
-                          </p>
-                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500">
-                            <code className="rounded-md bg-zinc-100 px-2 py-0.5 font-mono text-xs text-zinc-600">
-                              {key.keyPrefix}...
-                            </code>
-                            <span className="text-zinc-300">·</span>
-                            <span>Created {formatDate(key.createdAt)}</span>
-                            {key.lastUsedAt && (
-                              <>
-                                <span className="text-zinc-300">·</span>
-                                <span className="text-emerald-600">
-                                  Last used {formatDate(key.lastUsedAt)}
-                                </span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                        <Button
-                          className="ml-4 text-zinc-400 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
-                          onClick={() => handleDeleteKey(key._id)}
-                          size="sm"
-                          variant="ghost"
-                        >
-                          <HugeiconsIcon icon={Delete02Icon} size={16} />
-                          Delete
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <ApiKeysList
+                  apiKeys={apiKeys}
+                  formatDate={formatDate}
+                  onDeleteKey={handleDeleteKey}
+                />
               </div>
             </div>
           </section>
@@ -357,96 +497,11 @@ function SettingsPage() {
 
               <div className="mt-6 space-y-6">
                 <div className="overflow-hidden rounded-xl border border-zinc-200">
-                  {pushStatus === 'loading' ? (
-                    <div className="flex items-center gap-4 p-4">
-                      <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-900" />
-                      <span className="text-sm text-zinc-600">
-                        Checking notification status...
-                      </span>
-                    </div>
-                  ) : pushStatus === 'unsupported' ? (
-                    <div className="flex items-center gap-4 bg-zinc-50 p-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-200">
-                        <HugeiconsIcon
-                          className="text-zinc-500"
-                          icon={Cancel01Icon}
-                          size={18}
-                        />
-                      </div>
-                      <div>
-                        <p className="font-medium text-zinc-900">
-                          Not Supported
-                        </p>
-                        <p className="text-sm text-zinc-500">
-                          Push notifications are not supported in this browser
-                        </p>
-                      </div>
-                    </div>
-                  ) : pushStatus === 'denied' ? (
-                    <div className="flex items-center gap-4 bg-red-50 p-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100">
-                        <HugeiconsIcon
-                          className="text-red-600"
-                          icon={Cancel01Icon}
-                          size={18}
-                        />
-                      </div>
-                      <div>
-                        <p className="font-medium text-zinc-900">
-                          Notifications Blocked
-                        </p>
-                        <p className="text-sm text-zinc-500">
-                          Please enable notifications in your browser settings
-                        </p>
-                      </div>
-                    </div>
-                  ) : pushStatus === 'granted' ? (
-                    <div className="flex items-center gap-4 bg-emerald-50 p-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100">
-                        <HugeiconsIcon
-                          className="text-emerald-600"
-                          icon={CheckmarkCircle02Icon}
-                          size={18}
-                        />
-                      </div>
-                      <div>
-                        <p className="font-medium text-zinc-900">
-                          Notifications Enabled
-                        </p>
-                        <p className="text-sm text-zinc-500">
-                          You will receive push notifications when tasks
-                          complete
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-between bg-amber-50 p-4">
-                      <div className="flex items-center gap-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100">
-                          <HugeiconsIcon
-                            className="text-amber-600"
-                            icon={AlertCircleIcon}
-                            size={18}
-                          />
-                        </div>
-                        <div>
-                          <p className="font-medium text-zinc-900">
-                            Enable Notifications
-                          </p>
-                          <p className="text-sm text-zinc-500">
-                            Get notified when your tasks complete
-                          </p>
-                        </div>
-                      </div>
-                      <Button
-                        className="rounded-xl bg-zinc-900 hover:bg-zinc-800"
-                        disabled={subscribing}
-                        onClick={handleEnableNotifications}
-                      >
-                        {subscribing ? 'Enabling...' : 'Enable'}
-                      </Button>
-                    </div>
-                  )}
+                  <PushStatusBanner
+                    onEnableClick={handleEnableNotifications}
+                    status={pushStatus}
+                    subscribing={subscribing}
+                  />
                 </div>
 
                 <div className="space-y-1">

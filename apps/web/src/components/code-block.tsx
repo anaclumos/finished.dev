@@ -62,7 +62,7 @@ export function CodeBlock({
       {html ? (
         <div
           className="[&_pre]:!bg-transparent [&_code]:!bg-transparent overflow-x-auto p-4 text-left font-mono text-sm"
-          // eslint-disable-next-line react/no-danger -- shiki output is sanitized
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: shiki output is sanitized
           dangerouslySetInnerHTML={{ __html: html }}
         />
       ) : (
@@ -93,7 +93,7 @@ export function InlineCode({ children, lang = 'bash' }: InlineCodeProps) {
     return (
       <div
         className="[&_pre]:!m-0 [&_pre]:!bg-transparent [&_code]:!bg-transparent mt-4 block overflow-x-auto rounded bg-zinc-900 px-3 py-2 font-mono text-sm"
-        // eslint-disable-next-line react/no-danger -- shiki output is sanitized
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: shiki output is sanitized
         dangerouslySetInnerHTML={{ __html: html }}
       />
     )

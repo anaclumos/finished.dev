@@ -8,7 +8,7 @@ const recordedTasks: Array<{
   createdAt: string
 }> = []
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(() => {
   return { tasks: recordedTasks }
 })
 

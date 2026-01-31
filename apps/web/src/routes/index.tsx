@@ -79,7 +79,13 @@ function LandingPage() {
       <header className="fixed inset-x-0 top-0 z-50 border-zinc-100 border-b bg-white/80 backdrop-blur-sm">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
-            <img alt="finished.dev logo" className="h-8 w-8" src="/logo.png" />
+            <img
+              alt="finished.dev logo"
+              className="h-8 w-8"
+              height={32}
+              src="/logo.png"
+              width={32}
+            />
             <span className="font-semibold text-zinc-900">finished.dev</span>
           </div>
 
@@ -427,7 +433,9 @@ function LandingPage() {
               <img
                 alt="finished.dev logo"
                 className="h-8 w-8"
+                height={32}
                 src="/logo.png"
+                width={32}
               />
               <span className="font-semibold text-white">finished.dev</span>
             </div>

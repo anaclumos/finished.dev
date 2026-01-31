@@ -8,6 +8,42 @@
     "formatter": {
       "semicolons": "asNeeded",
       "quoteStyle": "single"
+    },
+    "globals": ["Bun"]
+  },
+  "overrides": [
+    {
+      "includes": ["apps/web/convex/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useFilenamingConvention": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["packages/cli/**"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveCognitiveComplexity": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["apps/web/src/routes/_app/settings.tsx"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveCognitiveComplexity": "off"
+          },
+          "suspicious": {
+            "noAlert": "off"
+          }
+        }
+      }
     }
-  }
+  ]
 }

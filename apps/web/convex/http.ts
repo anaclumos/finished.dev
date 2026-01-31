@@ -91,7 +91,7 @@ http.route({
         duration?: number
         source?: string
         machineId?: string
-        metadata?: any
+        metadata?: Record<string, unknown>
       }
 
       if (!title) {
@@ -176,7 +176,7 @@ http.route({
 http.route({
   path: '/api/health',
   method: 'GET',
-  handler: httpAction(async () => {
+  handler: httpAction(() => {
     return new Response(
       JSON.stringify({ status: 'ok', timestamp: Date.now() }),
       {

@@ -403,17 +403,21 @@ function DashboardPage() {
           </div>
 
           <div className="divide-y divide-zinc-100">
-            {tasks === undefined ? (
-              <LoadingState />
-            ) : tasks.length === 0 ? (
-              <EmptyState />
-            ) : (
-              <div className="max-h-[600px] overflow-y-auto">
-                {tasks.map((task) => (
-                  <TaskRow key={task._id} task={task} />
-                ))}
-              </div>
-            )}
+            {(() => {
+              if (tasks === undefined) {
+                return <LoadingState />
+              }
+              if (tasks.length === 0) {
+                return <EmptyState />
+              }
+              return (
+                <div className="max-h-[600px] overflow-y-auto">
+                  {tasks.map((task) => (
+                    <TaskRow key={task._id} task={task} />
+                  ))}
+                </div>
+              )
+            })()}
           </div>
         </div>
       </div>

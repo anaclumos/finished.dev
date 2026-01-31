@@ -1,4 +1,6 @@
+import type { GenericDatabaseReader } from 'convex/server'
 import { v } from 'convex/values'
+import type { DataModel, Id } from './_generated/dataModel'
 import { mutation, query } from './_generated/server'
 
 /**
@@ -120,14 +122,14 @@ export const remove = mutation({
  * Used internally by webhook handler
  */
 export const validateKey = async (
-  ctx: { db: any },
+  ctx: { db: GenericDatabaseReader<DataModel> },
   rawKey: string
-): Promise<{ userId: string; keyId: any } | null> => {
+): Promise<{ userId: string; keyId: Id<'apiKeys'> } | null> => {
   const keyHash = await hashApiKey(rawKey)
 
   const apiKey = await ctx.db
     .query('apiKeys')
-    .withIndex('by_keyHash', (q: any) => q.eq('keyHash', keyHash))
+    .withIndex('by_keyHash', (q) => q.eq('keyHash', keyHash))
     .first()
 
   if (!apiKey) {

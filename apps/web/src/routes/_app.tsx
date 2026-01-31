@@ -84,7 +84,13 @@ function AppLayout() {
       <aside className="fixed inset-y-0 left-0 z-50 w-64 border-zinc-200 border-r bg-white">
         <div className="flex h-full flex-col">
           <div className="flex h-14 items-center gap-2 border-zinc-200 border-b px-4">
-            <img alt="finished.dev" className="h-8 w-8" src="/logo.png" />
+            <img
+              alt="finished.dev"
+              className="h-8 w-8"
+              height={32}
+              src="/logo.png"
+              width={32}
+            />
             <span className="font-semibold text-zinc-900">finished.dev</span>
           </div>
 
