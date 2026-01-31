@@ -17,6 +17,6 @@
     "cli:install": "bun run packages/cli/src/index.ts install"
   },
   "devDependencies": {
-    "turbo": "^2.5.4"
+    "turbo": "^2.8.1"
   }
 }
