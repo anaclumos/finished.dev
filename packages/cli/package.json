@@ -1,6 +1,6 @@
 {
   "name": "@finished/cli",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Agent Fleet Management CLI - Phone Push Notifications When Agents Finish Tasks",
   "type": "module",
   "bin": {
@@ -12,11 +12,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/finished.dev.git"
+    "url": "https://github.com/anaclumos/finished.dev.git"
   },
   "homepage": "https://finished.dev",
   "bugs": {
-    "url": "https://github.com/your-org/finished.dev/issues"
+    "url": "https://github.com/anaclumos/finished.dev/issues"
   },
   "engines": {
     "bun": ">=1.0.0"
