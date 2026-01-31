@@ -92,7 +92,7 @@ function parseArgs(args: string[]): {
       result.status = args[++i] || 'success'
     } else if (arg === '--duration') {
       const dur = args[++i]
-      result.duration = dur ? parseInt(dur, 10) : null
+      result.duration = dur ? Number.parseInt(dur, 10) : null
     } else if (!arg.startsWith('-')) {
       if (!result.command) {
         result.command = arg
@@ -141,10 +141,14 @@ async function promptInput(prompt: string): Promise<string> {
 
   while (true) {
     const { done, value } = await reader.read()
-    if (done || !value) break
+    if (done || !value) {
+      break
+    }
     chunks.push(value)
     // Check for newline
-    if (value.includes(10)) break
+    if (value.includes(10)) {
+      break
+    }
   }
 
   reader.releaseLock()
@@ -205,16 +209,20 @@ async function ping(
   }
 
   // Only include optional fields if they have values
-  if (options.source) payload.source = options.source
-  if (options.duration) payload.duration = options.duration
+  if (options.source) {
+    payload.source = options.source
+  }
+  if (options.duration) {
+    payload.duration = options.duration
+  }
 
   const maxRetries = 3
   const backoffMs = 1000
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-       const url = `${config.serverUrl}/api/webhook/task`
-       const response = await fetch(url, {
+      const url = `${config.serverUrl}/api/webhook/task`
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -223,15 +231,20 @@ async function ping(
         body: JSON.stringify(payload),
       })
 
-       if (response.ok) {
-         await response.json()
-         console.log(`✅ ${message}`)
-         return
-       }
+      if (response.ok) {
+        await response.json()
+        console.log(`✅ ${message}`)
+        return
+      }
 
-        const error = await response.json().catch(() => ({})) as Record<string, unknown>
-        if (response.status === 401) {
-         console.error(`❌ Authentication failed: ${error.error || 'Invalid API key'}`)
+      const error = (await response.json().catch(() => ({}))) as Record<
+        string,
+        unknown
+      >
+      if (response.status === 401) {
+        console.error(
+          `❌ Authentication failed: ${error.error || 'Invalid API key'}`
+        )
         console.error('   Run "finished init" to reconfigure')
         process.exit(1)
       }
@@ -243,16 +256,20 @@ async function ping(
 
       // Server error, retry
       throw new Error(`Server error: ${response.status}`)
-    } catch (error) {
+    } catch (_error) {
       if (attempt < maxRetries) {
         const delay = backoffMs * attempt
-        console.warn(`⚠️  Attempt ${attempt}/${maxRetries} failed, retrying in ${delay}ms...`)
+        console.warn(
+          `⚠️  Attempt ${attempt}/${maxRetries} failed, retrying in ${delay}ms...`
+        )
         await new Promise((r) => setTimeout(r, delay))
       } else {
         // Final attempt failed - warn but don't block
         console.warn(`⚠️  Could not reach server after ${maxRetries} attempts`)
         console.warn(`   Task: ${message}`)
-        console.warn('   The notification was not sent, but your task continues.')
+        console.warn(
+          '   The notification was not sent, but your task continues.'
+        )
         // Exit 0 to not break CI/scripts
         process.exit(0)
       }
@@ -294,17 +311,28 @@ async function testConnection(): Promise<void> {
       }),
     })
 
-     if (testResponse.ok) {
-       console.log('✅ API key is valid')
-       console.log('✅ Test notification sent!')
-       console.log('\n🎉 Everything is working! You should receive a push notification.')
-     } else {
-       const error = await testResponse.json().catch(() => ({})) as Record<string, unknown>
-       console.error('❌ API key validation failed:', error.error || testResponse.statusText)
+    if (testResponse.ok) {
+      console.log('✅ API key is valid')
+      console.log('✅ Test notification sent!')
+      console.log(
+        '\n🎉 Everything is working! You should receive a push notification.'
+      )
+    } else {
+      const error = (await testResponse.json().catch(() => ({}))) as Record<
+        string,
+        unknown
+      >
+      console.error(
+        '❌ API key validation failed:',
+        error.error || testResponse.statusText
+      )
       process.exit(1)
     }
   } catch (error) {
-    console.error('❌ Connection failed:', error instanceof Error ? error.message : error)
+    console.error(
+      '❌ Connection failed:',
+      error instanceof Error ? error.message : error
+    )
     process.exit(1)
   }
 }
@@ -328,7 +356,7 @@ async function main(): Promise<void> {
   const args = process.argv.slice(2)
   const parsed = parseArgs(args)
 
-  if (parsed.help || (!parsed.command && !parsed.version)) {
+  if (parsed.help || !(parsed.command || parsed.version)) {
     console.log(HELP)
     process.exit(0)
   }

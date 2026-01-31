@@ -1,6 +1,6 @@
 // Service Worker for finished.dev push notifications
 
-self.addEventListener('install', (event) => {
+self.addEventListener('install', (_event) => {
   console.log('[SW] Service worker installed')
   self.skipWaiting()
 })
@@ -56,22 +56,24 @@ self.addEventListener('notificationclick', (event) => {
   const url = event.notification.data?.url || '/dashboard'
 
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // Check if there's already a window open
-      for (const client of clientList) {
-        if (client.url.includes(self.location.origin) && 'focus' in client) {
-          client.navigate(url)
-          return client.focus()
+    clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // Check if there's already a window open
+        for (const client of clientList) {
+          if (client.url.includes(self.location.origin) && 'focus' in client) {
+            client.navigate(url)
+            return client.focus()
+          }
         }
-      }
-      // Open new window if none exists
-      if (clients.openWindow) {
-        return clients.openWindow(url)
-      }
-    })
+        // Open new window if none exists
+        if (clients.openWindow) {
+          return clients.openWindow(url)
+        }
+      })
   )
 })
 
-self.addEventListener('notificationclose', (event) => {
+self.addEventListener('notificationclose', (_event) => {
   console.log('[SW] Notification closed')
 })

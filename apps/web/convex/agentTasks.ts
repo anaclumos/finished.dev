@@ -1,6 +1,5 @@
 import { v } from 'convex/values'
-import { mutation, query, internalMutation } from './_generated/server'
-import { Id } from './_generated/dataModel'
+import { internalMutation, mutation, query } from './_generated/server'
 
 /**
  * Record a completed agent task

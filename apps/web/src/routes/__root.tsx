@@ -1,6 +1,6 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router'
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { Analytics } from '@vercel/analytics/react'
 import { ConvexClerkProvider } from '../providers/convex-clerk-provider'
 
@@ -21,7 +21,8 @@ export const Route = createRootRoute({
       },
       {
         name: 'description',
-        content: 'Get Phone Push Notifications When Your Agents, Builds, or Background Tasks Complete.',
+        content:
+          'Get Phone Push Notifications When Your Agents, Builds, or Background Tasks Complete.',
       },
       {
         property: 'og:type',
@@ -37,7 +38,8 @@ export const Route = createRootRoute({
       },
       {
         property: 'og:description',
-        content: 'Get Phone Push Notifications When Your Agents, Builds, or Background Tasks Complete.',
+        content:
+          'Get Phone Push Notifications When Your Agents, Builds, or Background Tasks Complete.',
       },
       {
         property: 'og:image',
@@ -61,7 +63,8 @@ export const Route = createRootRoute({
       },
       {
         name: 'twitter:description',
-        content: 'Get Phone Push Notifications When Your Agents, Builds, or Background Tasks Complete.',
+        content:
+          'Get Phone Push Notifications When Your Agents, Builds, or Background Tasks Complete.',
       },
       {
         name: 'twitter:image',

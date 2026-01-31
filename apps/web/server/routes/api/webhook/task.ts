@@ -1,10 +1,10 @@
-import { defineEventHandler, readBody, getHeader, createError } from 'h3'
+import { defineEventHandler, getHeader, HTTPError, readBody } from 'h3'
 
 export default defineEventHandler(async (event) => {
   const convexUrl = process.env.VITE_CONVEX_URL
 
   if (!convexUrl) {
-    throw createError({ statusCode: 500, message: 'Server configuration error' })
+    throw new HTTPError('Server configuration error', { status: 500 })
   }
 
   // Convex HTTP routes are on .convex.site, not .convex.cloud
@@ -23,16 +23,16 @@ export default defineEventHandler(async (event) => {
       body: JSON.stringify(body),
     })
 
-    const data = await response.json()
-
-    if (!response.ok) {
-      throw createError({ statusCode: response.status, data })
-    }
-
-    return data
+    const text = await response.text()
+    return new Response(text, {
+      status: response.status,
+      headers: { 'Content-Type': 'application/json' },
+    })
   } catch (error) {
-    if ((error as any).statusCode) throw error
+    if (error instanceof HTTPError) {
+      throw error
+    }
     console.error('Failed to proxy to Convex:', error)
-    throw createError({ statusCode: 502, message: 'Failed to connect to backend' })
+    throw new HTTPError('Failed to connect to backend', { status: 502 })
   }
 })

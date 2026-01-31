@@ -1,5 +1,5 @@
 import { defineEventHandler } from 'h3'
 
 export default defineEventHandler(async () => {
-  return { status: 'ok', timestamp: Date.now() };
-});
+  return { status: 'ok', timestamp: Date.now() }
+})

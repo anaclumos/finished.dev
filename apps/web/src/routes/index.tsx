@@ -1,22 +1,22 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
 import {
+  ClerkLoaded,
+  ClerkLoading,
   SignedIn,
   SignedOut,
-  ClerkLoading,
-  ClerkLoaded,
 } from '@clerk/clerk-react'
-import { Button } from '@/components/ui/button'
-import { CodeBlock, InlineCode } from '@/components/code-block'
-import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  Notification01Icon,
-  CommandIcon,
-  Clock01Icon,
   CheckmarkCircle02Icon,
-  LaptopIcon,
+  Clock01Icon,
   CloudIcon,
+  CommandIcon,
   FlashIcon,
+  LaptopIcon,
+  Notification01Icon,
 } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { CodeBlock, InlineCode } from '@/components/code-block'
+import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/')({ component: LandingPage })
 
@@ -57,8 +57,7 @@ const useCases = [
   {
     icon: FlashIcon,
     title: 'Agent Workflows',
-    description:
-      'Monitor multi-step Agent workflows across multiple machines.',
+    description: 'Monitor multi-step Agent workflows across multiple machines.',
   },
 ]
 
@@ -77,18 +76,18 @@ function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-zinc-100 bg-white/80 backdrop-blur-sm">
+      <header className="fixed inset-x-0 top-0 z-50 border-zinc-100 border-b bg-white/80 backdrop-blur-sm">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="finished.dev logo" className="h-8 w-8" />
+            <img alt="finished.dev logo" className="h-8 w-8" src="/logo.png" />
             <span className="font-semibold text-zinc-900">finished.dev</span>
           </div>
 
           <div className="flex items-center gap-4">
             <ClerkLoading>
               <Link
+                className="font-medium text-sm text-zinc-600 hover:text-zinc-900"
                 to="/sign-in"
-                className="text-sm font-medium text-zinc-600 hover:text-zinc-900"
               >
                 Sign In
               </Link>
@@ -99,8 +98,8 @@ function LandingPage() {
             <ClerkLoaded>
               <SignedOut>
                 <Link
+                  className="font-medium text-sm text-zinc-600 hover:text-zinc-900"
                   to="/sign-in"
-                  className="text-sm font-medium text-zinc-600 hover:text-zinc-900"
                 >
                   Sign In
                 </Link>
@@ -124,20 +123,20 @@ function LandingPage() {
           <div className="mx-auto max-w-3xl text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-1.5 text-sm text-zinc-600">
               <HugeiconsIcon
+                className="text-amber-500"
                 icon={FlashIcon}
                 size={14}
-                className="text-amber-500"
               />
               Agent Fleet Management
             </div>
 
-            <h1 className="text-5xl font-semibold tracking-tight text-zinc-900 sm:text-6xl">
+            <h1 className="font-semibold text-5xl text-zinc-900 tracking-tight sm:text-6xl">
               Phone Push Notifications
               <br />
               <span className="text-amber-500">When Agents Finish</span>
             </h1>
 
-            <p className="mt-6 text-lg leading-relaxed text-zinc-600">
+            <p className="mt-6 text-lg text-zinc-600 leading-relaxed">
               Get Phone Push Notifications the Moment Your Agents, Builds, or
               Background Tasks Complete. One CLI Command, Zero Friction.
             </p>
@@ -176,10 +175,10 @@ function LandingPage() {
       </section>
 
       {/* How it works */}
-      <section className="border-t border-zinc-100 bg-zinc-50 py-24">
+      <section className="border-zinc-100 border-t bg-zinc-50 py-24">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
+            <h2 className="font-semibold text-3xl text-zinc-900 tracking-tight">
               How It Works
             </h2>
             <p className="mt-4 text-zinc-600">
@@ -189,10 +188,10 @@ function LandingPage() {
 
           <div className="mt-16 grid gap-8 md:grid-cols-3">
             <div className="relative rounded-2xl border border-zinc-200 bg-white p-8">
-              <div className="absolute -top-4 left-8 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900 text-sm font-bold text-white">
+              <div className="absolute -top-4 left-8 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900 font-bold text-sm text-white">
                 1
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-zinc-900">
+              <h3 className="mt-4 font-semibold text-lg text-zinc-900">
                 Install the CLI
               </h3>
               <p className="mt-2 text-zinc-600">
@@ -202,10 +201,10 @@ function LandingPage() {
             </div>
 
             <div className="relative rounded-2xl border border-zinc-200 bg-white p-8">
-              <div className="absolute -top-4 left-8 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900 text-sm font-bold text-white">
+              <div className="absolute -top-4 left-8 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900 font-bold text-sm text-white">
                 2
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-zinc-900">
+              <h3 className="mt-4 font-semibold text-lg text-zinc-900">
                 Configure Once
               </h3>
               <p className="mt-2 text-zinc-600">
@@ -215,10 +214,10 @@ function LandingPage() {
             </div>
 
             <div className="relative rounded-2xl border border-zinc-200 bg-white p-8">
-              <div className="absolute -top-4 left-8 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900 text-sm font-bold text-white">
+              <div className="absolute -top-4 left-8 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900 font-bold text-sm text-white">
                 3
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-zinc-900">
+              <h3 className="mt-4 font-semibold text-lg text-zinc-900">
                 Ping When Done
               </h3>
               <p className="mt-2 text-zinc-600">
@@ -234,7 +233,7 @@ function LandingPage() {
       <section className="py-24">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
+            <h2 className="font-semibold text-3xl text-zinc-900 tracking-tight">
               Simple, Powerful, Reliable
             </h2>
             <p className="mt-4 text-zinc-600">
@@ -245,13 +244,13 @@ function LandingPage() {
           <div className="mt-16 grid gap-8 md:grid-cols-3">
             {features.map((feature) => (
               <div
-                key={feature.title}
                 className="rounded-2xl border border-zinc-200 bg-white p-8"
+                key={feature.title}
               >
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-900 text-white">
                   <HugeiconsIcon icon={feature.icon} size={24} />
                 </div>
-                <h3 className="text-lg font-semibold text-zinc-900">
+                <h3 className="font-semibold text-lg text-zinc-900">
                   {feature.title}
                 </h3>
                 <p className="mt-2 text-zinc-600">{feature.description}</p>
@@ -262,11 +261,11 @@ function LandingPage() {
       </section>
 
       {/* Use Cases */}
-      <section className="border-t border-zinc-100 bg-zinc-50 py-24">
+      <section className="border-zinc-100 border-t bg-zinc-50 py-24">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid items-center gap-16 lg:grid-cols-2">
             <div>
-              <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
+              <h2 className="font-semibold text-3xl text-zinc-900 tracking-tight">
                 Perfect For
               </h2>
               <p className="mt-4 text-lg text-zinc-600">
@@ -276,7 +275,7 @@ function LandingPage() {
 
               <div className="mt-8 space-y-6">
                 {useCases.map((useCase) => (
-                  <div key={useCase.title} className="flex gap-4">
+                  <div className="flex gap-4" key={useCase.title}>
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white">
                       <HugeiconsIcon icon={useCase.icon} size={20} />
                     </div>
@@ -294,35 +293,35 @@ function LandingPage() {
 
               <div className="mt-10">
                 <ClerkLoading>
-                <Link to="/waitlist">
-                  <Button>Join the Waitlist</Button>
-                </Link>
-              </ClerkLoading>
-              <ClerkLoaded>
-                <SignedOut>
                   <Link to="/waitlist">
                     <Button>Join the Waitlist</Button>
                   </Link>
-                </SignedOut>
-              </ClerkLoaded>
+                </ClerkLoading>
+                <ClerkLoaded>
+                  <SignedOut>
+                    <Link to="/waitlist">
+                      <Button>Join the Waitlist</Button>
+                    </Link>
+                  </SignedOut>
+                </ClerkLoaded>
               </div>
             </div>
 
             <div className="relative">
               <div className="rounded-2xl border border-zinc-200 bg-white p-6">
-                <div className="mb-4 flex items-center gap-2 text-sm font-medium text-zinc-500">
+                <div className="mb-4 flex items-center gap-2 font-medium text-sm text-zinc-500">
                   <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500"></span>
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
                   </span>
                   Live Notifications
                 </div>
                 <div className="space-y-3 font-mono text-sm">
                   <div className="flex items-center gap-2 text-zinc-600">
                     <HugeiconsIcon
+                      className="text-zinc-400"
                       icon={CheckmarkCircle02Icon}
                       size={16}
-                      className="text-zinc-400"
                     />
                     <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500">
                       claude
@@ -332,9 +331,9 @@ function LandingPage() {
                   </div>
                   <div className="flex items-center gap-2 text-zinc-600">
                     <HugeiconsIcon
+                      className="text-zinc-400"
                       icon={CheckmarkCircle02Icon}
                       size={16}
-                      className="text-zinc-400"
                     />
                     <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500">
                       cursor
@@ -344,9 +343,9 @@ function LandingPage() {
                   </div>
                   <div className="flex items-center gap-2 text-zinc-600">
                     <HugeiconsIcon
+                      className="text-zinc-400"
                       icon={CheckmarkCircle02Icon}
                       size={16}
-                      className="text-zinc-400"
                     />
                     <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500">
                       opencode
@@ -356,9 +355,9 @@ function LandingPage() {
                   </div>
                   <div className="flex items-center gap-2 text-zinc-600">
                     <HugeiconsIcon
+                      className="text-zinc-400"
                       icon={CheckmarkCircle02Icon}
                       size={16}
-                      className="text-zinc-400"
                     />
                     <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-500">
                       cli
@@ -374,9 +373,9 @@ function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="border-t border-zinc-100 bg-zinc-900 py-24">
+      <section className="border-zinc-100 border-t bg-zinc-900 py-24">
         <div className="mx-auto max-w-7xl px-6 text-center">
-          <h2 className="text-3xl font-semibold tracking-tight text-white">
+          <h2 className="font-semibold text-3xl text-white tracking-tight">
             Get Phone Push Alerts When Agents Finish
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
@@ -387,8 +386,8 @@ function LandingPage() {
             <ClerkLoading>
               <Link to="/waitlist">
                 <Button
-                  size="lg"
                   className="bg-white text-zinc-900 hover:bg-zinc-100"
+                  size="lg"
                 >
                   Join the Waitlist
                 </Button>
@@ -398,8 +397,8 @@ function LandingPage() {
               <SignedOut>
                 <Link to="/waitlist">
                   <Button
-                    size="lg"
                     className="bg-white text-zinc-900 hover:bg-zinc-100"
+                    size="lg"
                   >
                     Join the Waitlist
                   </Button>
@@ -408,8 +407,8 @@ function LandingPage() {
               <SignedIn>
                 <Link to="/dashboard">
                   <Button
-                    size="lg"
                     className="bg-white text-zinc-900 hover:bg-zinc-100"
+                    size="lg"
                   >
                     Open Dashboard
                   </Button>
@@ -421,11 +420,15 @@ function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-800 bg-zinc-900 py-12">
+      <footer className="border-zinc-800 border-t bg-zinc-900 py-12">
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <img src="/logo.png" alt="finished.dev logo" className="h-8 w-8" />
+              <img
+                alt="finished.dev logo"
+                className="h-8 w-8"
+                src="/logo.png"
+              />
               <span className="font-semibold text-white">finished.dev</span>
             </div>
             <p className="text-sm text-zinc-500">

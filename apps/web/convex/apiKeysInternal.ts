@@ -1,5 +1,5 @@
 import { v } from 'convex/values'
-import { internalQuery, internalMutation } from './_generated/server'
+import { internalMutation, internalQuery } from './_generated/server'
 
 /**
  * Get API key by hash (internal only, for webhook validation)

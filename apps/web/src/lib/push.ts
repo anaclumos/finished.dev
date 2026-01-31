@@ -11,7 +11,9 @@ const SW_PATH = '/sw.js'
  * Check if push notifications are supported
  */
 export function isPushSupported(): boolean {
-  if (typeof window === 'undefined') return false
+  if (typeof window === 'undefined') {
+    return false
+  }
   return (
     'serviceWorker' in navigator &&
     'PushManager' in window &&
@@ -23,7 +25,9 @@ export function isPushSupported(): boolean {
  * Get the current notification permission status
  */
 export function getPermissionStatus(): NotificationPermission {
-  if (!isPushSupported()) return 'denied'
+  if (!isPushSupported()) {
+    return 'denied'
+  }
   return Notification.permission
 }
 

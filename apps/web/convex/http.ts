@@ -1,6 +1,6 @@
 import { httpRouter } from 'convex/server'
-import { httpAction } from './_generated/server'
 import { internal } from './_generated/api'
+import { httpAction } from './_generated/server'
 
 const http = httpRouter()
 
@@ -52,7 +52,7 @@ http.route({
     try {
       // Extract API key from Authorization header
       const authHeader = request.headers.get('Authorization')
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      if (!authHeader?.startsWith('Bearer ')) {
         return new Response(
           JSON.stringify({ error: 'Missing or invalid Authorization header' }),
           { status: 401, headers }
@@ -69,15 +69,18 @@ http.route({
 
       // Hash and validate API key
       const keyHash = await hashApiKey(apiKey)
-      const apiKeyRecord = await ctx.runQuery(internal.apiKeysInternal.getByHash, {
-        keyHash,
-      })
+      const apiKeyRecord = await ctx.runQuery(
+        internal.apiKeysInternal.getByHash,
+        {
+          keyHash,
+        }
+      )
 
       if (!apiKeyRecord) {
-        return new Response(
-          JSON.stringify({ error: 'Invalid API key' }),
-          { status: 401, headers }
-        )
+        return new Response(JSON.stringify({ error: 'Invalid API key' }), {
+          status: 401,
+          headers,
+        })
       }
 
       // Parse request body
@@ -101,7 +104,9 @@ http.route({
       const taskStatus = status || 'success'
       if (!['success', 'failure', 'cancelled'].includes(taskStatus)) {
         return new Response(
-          JSON.stringify({ error: 'Invalid status. Must be: success, failure, or cancelled' }),
+          JSON.stringify({
+            error: 'Invalid status. Must be: success, failure, or cancelled',
+          }),
           { status: 400, headers }
         )
       }

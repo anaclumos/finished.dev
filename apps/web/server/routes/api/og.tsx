@@ -1,6 +1,6 @@
+import { defineEventHandler, setHeader } from 'h3'
 import satori from 'satori'
 import sharp from 'sharp'
-import { defineEventHandler, setHeader } from 'h3'
 
 const fontPromise = fetch(
   'https://cdn.jsdelivr.net/fontsource/fonts/figtree@latest/latin-400-normal.ttf'
@@ -41,13 +41,13 @@ export default defineEventHandler(async (event) => {
         }}
       >
         <img
-          src={logoBase64}
           alt="finished.dev logo"
-          width={80}
           height={80}
+          src={logoBase64}
           style={{
             borderRadius: '16px',
           }}
+          width={80}
         />
         <span
           style={{
@@ -173,8 +173,18 @@ export default defineEventHandler(async (event) => {
       width: 1200,
       height: 630,
       fonts: [
-        { name: 'Figtree', data: fontData, weight: 400, style: 'normal' as const },
-        { name: 'Figtree', data: fontBoldData, weight: 600, style: 'normal' as const },
+        {
+          name: 'Figtree',
+          data: fontData,
+          weight: 400,
+          style: 'normal' as const,
+        },
+        {
+          name: 'Figtree',
+          data: fontBoldData,
+          weight: 600,
+          style: 'normal' as const,
+        },
       ],
     }
   )

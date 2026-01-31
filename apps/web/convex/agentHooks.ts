@@ -1,8 +1,8 @@
 'use node'
 
-import { internalAction } from './_generated/server'
 import { v } from 'convex/values'
 import webpush from 'web-push'
+import { internalAction } from './_generated/server'
 
 /**
  * Internal action to trigger web push notifications on agent completion
@@ -29,9 +29,9 @@ export const notifyAgentCompletion = internalAction({
     const privateKey = process.env.WEB_PUSH_PRIVATE_KEY
     const subject = process.env.WEB_PUSH_SUBJECT
 
-    if (!publicKey || !privateKey || !subject) {
+    if (!(publicKey && privateKey && subject)) {
       throw new Error(
-        'Missing required environment variables: WEB_PUSH_PUBLIC_KEY, WEB_PUSH_PRIVATE_KEY, WEB_PUSH_SUBJECT',
+        'Missing required environment variables: WEB_PUSH_PUBLIC_KEY, WEB_PUSH_PRIVATE_KEY, WEB_PUSH_SUBJECT'
       )
     }
 
@@ -77,7 +77,7 @@ export const notifyAgentCompletion = internalAction({
               auth: subscription.auth,
             },
           },
-          payload,
+          payload
         )
         sent++
       } catch (error) {

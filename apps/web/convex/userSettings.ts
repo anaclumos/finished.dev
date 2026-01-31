@@ -55,8 +55,12 @@ export const update = mutation({
 
     if (existing) {
       await ctx.db.patch(existing._id, {
-        ...(args.pushEnabled !== undefined && { pushEnabled: args.pushEnabled }),
-        ...(args.soundEnabled !== undefined && { soundEnabled: args.soundEnabled }),
+        ...(args.pushEnabled !== undefined && {
+          pushEnabled: args.pushEnabled,
+        }),
+        ...(args.soundEnabled !== undefined && {
+          soundEnabled: args.soundEnabled,
+        }),
         updatedAt: Date.now(),
       })
       return existing._id
