@@ -1,60 +1,38 @@
-import { defineEventHandler, readBody, getHeader, setResponseStatus } from 'h3'
-import crypto from 'crypto'
-import { recordTask } from '../tasks'
-
-async function hashApiKey(key: string): Promise<string> {
-  return crypto.createHash('sha256').update(key).digest('hex');
-}
+import { defineEventHandler, readBody, getHeader, createError } from 'h3'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  const authHeader = getHeader(event, 'authorization');
+  const convexUrl = process.env.VITE_CONVEX_URL
 
-  // Validate authorization header
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    setResponseStatus(event, 401);
-    return { error: 'Missing or invalid Authorization header' };
+  if (!convexUrl) {
+    throw createError({ statusCode: 500, message: 'Server configuration error' })
   }
 
-  const apiKey = authHeader.slice(7);
-  if (!apiKey.startsWith('fin_')) {
-    setResponseStatus(event, 401);
-    return { error: 'Invalid API key format' };
+  // Convex HTTP routes are on .convex.site, not .convex.cloud
+  const convexHttpUrl = convexUrl.replace('.convex.cloud', '.convex.site')
+
+  const body = await readBody(event)
+  const authHeader = getHeader(event, 'authorization')
+
+  try {
+    const response = await fetch(`${convexHttpUrl}/api/webhook/task`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authHeader ? { Authorization: authHeader } : {}),
+      },
+      body: JSON.stringify(body),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw createError({ statusCode: response.status, data })
+    }
+
+    return data
+  } catch (error) {
+    if ((error as any).statusCode) throw error
+    console.error('Failed to proxy to Convex:', error)
+    throw createError({ statusCode: 502, message: 'Failed to connect to backend' })
   }
-
-  // For now, just validate the API key format and return success
-  // In production, this would query the Convex database
-  const keyHash = await hashApiKey(apiKey);
-  
-  // Hardcoded validation for E2E test
-  const expectedHash = '87b6d2a74a6481eafe7b45e24b5bd4d9acf4efbdd632965f00c8e6df6e235154';
-  if (keyHash !== expectedHash) {
-    setResponseStatus(event, 401);
-    return { error: 'Invalid API key' };
-  }
-
-  // Validate required fields
-  const { title, status } = body as { title?: string; status?: string };
-  if (!title) {
-    setResponseStatus(event, 400);
-    return { error: 'Missing required field: title' };
-  }
-
-  const taskStatus = status || 'success';
-  if (!['success', 'failure', 'cancelled'].includes(taskStatus)) {
-    setResponseStatus(event, 400);
-    return { error: 'Invalid status. Must be: success, failure, or cancelled' };
-  }
-
-  // Record the task
-  const { source } = body as { source?: string };
-  recordTask({ title, status: taskStatus, source });
-
-  // Return success
-  setResponseStatus(event, 200);
-  return {
-    success: true,
-    taskId: 'test-' + Date.now(),
-    message: 'Task recorded successfully',
-  };
-});
+})
