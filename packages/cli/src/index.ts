@@ -202,7 +202,7 @@ async function init(serverUrl: string): Promise<void> {
   console.log('\nTest your setup:')
   console.log('  finished test')
   console.log('\nSend your first notification:')
-  console.log('  finished ping "Hello from finished CLI!"')
+  console.log('  finished ping "Hello from finished CLI"')
 }
 
 async function ping(
