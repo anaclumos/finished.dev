@@ -1,6 +1,5 @@
 {
   "name": "finished.dev",
-  "private": true,
   "type": "module",
   "packageManager": "bun@1.2.19",
   "workspaces": [
