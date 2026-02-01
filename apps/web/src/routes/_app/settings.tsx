@@ -127,7 +127,7 @@ function ApiKeysList({
   }
 
   return (
-    <div className="divide-y divide-border/60">
+    <div className="divide-y divide-zinc-200/80">
       {apiKeys.map((key) => (
         <div
           className="group flex items-center justify-between py-4 first:pt-0 last:pb-0"
