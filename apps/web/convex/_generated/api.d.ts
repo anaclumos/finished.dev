@@ -13,6 +13,7 @@ import type * as agentTasks from "../agentTasks.js";
 import type * as apiKeys from "../apiKeys.js";
 import type * as apiKeysInternal from "../apiKeysInternal.js";
 import type * as http from "../http.js";
+import type * as notifications from "../notifications.js";
 import type * as pushSubscriptions from "../pushSubscriptions.js";
 import type * as userSettings from "../userSettings.js";
 import type * as userSettingsInternal from "../userSettingsInternal.js";
@@ -29,6 +30,7 @@ declare const fullApi: ApiFromModules<{
   apiKeys: typeof apiKeys;
   apiKeysInternal: typeof apiKeysInternal;
   http: typeof http;
+  notifications: typeof notifications;
   pushSubscriptions: typeof pushSubscriptions;
   userSettings: typeof userSettings;
   userSettingsInternal: typeof userSettingsInternal;

@@ -17,7 +17,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useMutation, useQuery } from 'convex/react'
+import { useAction, useMutation, useQuery } from 'convex/react'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -42,13 +42,13 @@ function SectionHeader({
   description: string
 }) {
   return (
-    <div className="flex items-start gap-4 border-zinc-100 border-b pb-6">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-zinc-900">
-        <HugeiconsIcon className="text-white" icon={icon} size={22} />
+    <div className="flex items-start gap-4 border-border/60 border-b pb-6">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-foreground text-background">
+        <HugeiconsIcon className="text-inherit" icon={icon} size={22} />
       </div>
       <div>
-        <h2 className="font-semibold text-lg text-zinc-900">{title}</h2>
-        <p className="mt-1 text-sm text-zinc-500">{description}</p>
+        <h2 className="font-semibold text-foreground text-lg">{title}</h2>
+        <p className="mt-1 text-muted-foreground text-sm">{description}</p>
       </div>
     </div>
   )
@@ -103,7 +103,7 @@ function ApiKeysList({
   if (apiKeys === undefined) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-zinc-200 border-t-zinc-900" />
+        <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-border border-t-foreground" />
       </div>
     )
   }
@@ -111,15 +111,15 @@ function ApiKeysList({
   if (apiKeys.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100">
+        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
           <HugeiconsIcon
-            className="text-zinc-400"
+            className="text-muted-foreground"
             icon={ShieldKeyIcon}
             size={24}
           />
         </div>
-        <p className="font-medium text-zinc-900">No API keys yet</p>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="font-medium text-foreground">No API keys yet</p>
+        <p className="mt-1 text-muted-foreground text-sm">
           Create one to start using the CLI
         </p>
       </div>
@@ -127,24 +127,24 @@ function ApiKeysList({
   }
 
   return (
-    <div className="divide-y divide-zinc-100">
+    <div className="divide-y divide-border/60">
       {apiKeys.map((key) => (
         <div
           className="group flex items-center justify-between py-4 first:pt-0 last:pb-0"
           key={key._id}
         >
           <div className="min-w-0 flex-1">
-            <p className="font-medium text-zinc-900">{key.name}</p>
-            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500">
-              <code className="rounded-md bg-zinc-100 px-2 py-0.5 font-mono text-xs text-zinc-600">
+            <p className="font-medium text-foreground">{key.name}</p>
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground text-sm">
+              <code className="rounded-md bg-muted px-2 py-0.5 font-mono text-foreground/70 text-xs">
                 {key.keyPrefix}...
               </code>
-              <span className="text-zinc-300">·</span>
+              <span className="text-muted-foreground/40">·</span>
               <span>Created {formatDate(key.createdAt)}</span>
               {key.lastUsedAt && (
                 <>
-                  <span className="text-zinc-300">·</span>
-                  <span className="text-emerald-600">
+                  <span className="text-muted-foreground/40">·</span>
+                  <span className="text-emerald-600 dark:text-emerald-400">
                     Last used {formatDate(key.lastUsedAt)}
                   </span>
                 </>
@@ -152,7 +152,7 @@ function ApiKeysList({
             </div>
           </div>
           <Button
-            className="ml-4 text-zinc-400 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
+            className="ml-4 text-muted-foreground/60 opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100 dark:hover:bg-destructive/20"
             onClick={() => onDeleteKey(key._id)}
             size="sm"
             variant="ghost"
@@ -285,6 +285,7 @@ function SettingsPage() {
   const upsertSubscription = useMutation(
     api.pushSubscriptions.upsertSubscription
   )
+  const sendTestNotification = useAction(api.notifications.sendTestNotification)
 
   const [keyName, setKeyName] = useState('')
   const [creating, setCreating] = useState(false)
@@ -294,6 +295,12 @@ function SettingsPage() {
     'loading' | 'unsupported' | 'denied' | 'granted' | 'default'
   >('loading')
   const [subscribing, setSubscribing] = useState(false)
+  const [testNotificationStatus, setTestNotificationStatus] = useState<
+    'idle' | 'sending' | 'success' | 'error'
+  >('idle')
+  const [testNotificationMessage, setTestNotificationMessage] = useState<
+    string | null
+  >(null)
 
   useEffect(() => {
     if (!isPushSupported()) {
@@ -302,6 +309,19 @@ function SettingsPage() {
     }
     setPushStatus(getPermissionStatus())
   }, [])
+
+  useEffect(() => {
+    if (testNotificationStatus !== 'success') {
+      return
+    }
+
+    const timeout = setTimeout(() => {
+      setTestNotificationStatus('idle')
+      setTestNotificationMessage(null)
+    }, 4000)
+
+    return () => clearTimeout(timeout)
+  }, [testNotificationStatus])
 
   const handleEnableNotifications = async () => {
     setSubscribing(true)
@@ -324,6 +344,33 @@ function SettingsPage() {
       setPushStatus(getPermissionStatus())
     } finally {
       setSubscribing(false)
+    }
+  }
+
+  const handleSendTestNotification = async () => {
+    setTestNotificationStatus('sending')
+    setTestNotificationMessage(null)
+
+    try {
+      const result = await sendTestNotification({})
+
+      if (result.sent > 0) {
+        setTestNotificationStatus('success')
+        setTestNotificationMessage('Test notification sent. Check your device.')
+      } else {
+        setTestNotificationStatus('error')
+        setTestNotificationMessage(
+          result.message ??
+            'No push subscriptions found. Enable notifications and try again.'
+        )
+      }
+    } catch (error) {
+      setTestNotificationStatus('error')
+      setTestNotificationMessage(
+        error instanceof Error
+          ? error.message
+          : 'Failed to send test notification.'
+      )
     }
   }
 
@@ -376,6 +423,22 @@ function SettingsPage() {
     })
   }
 
+  const pushEnabled = settings?.pushEnabled ?? true
+  const testUnavailableReason = (() => {
+    if (pushStatus !== 'granted') {
+      return 'Enable notifications in your browser to send a test.'
+    }
+    if (!pushEnabled) {
+      return 'Turn on Push Notifications to send a test.'
+    }
+    return null
+  })()
+  const canSendTestNotification =
+    pushStatus === 'granted' &&
+    pushEnabled &&
+    !subscribing &&
+    testNotificationStatus !== 'sending'
+
   return (
     <div className="min-h-screen bg-zinc-50/50 p-8">
       <div className="mx-auto max-w-3xl">
@@ -398,10 +461,10 @@ function SettingsPage() {
         </div>
 
         {newKey && (
-          <div className="mb-8 overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-emerald-50/50">
+          <div className="mb-8 overflow-hidden rounded-2xl border border-emerald-200/70 bg-gradient-to-r from-emerald-50 to-emerald-50/60 dark:border-emerald-900/50 dark:from-emerald-950/60 dark:to-emerald-900/30">
             <div className="p-6">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 dark:bg-emerald-400">
                   <HugeiconsIcon
                     className="text-white"
                     icon={CheckmarkCircle02Icon}
@@ -409,25 +472,25 @@ function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-emerald-900">
+                  <h3 className="font-semibold text-emerald-900 dark:text-emerald-100">
                     API Key Created
                   </h3>
-                  <p className="text-emerald-700 text-sm">
+                  <p className="text-emerald-700 text-sm dark:text-emerald-200/80">
                     Copy this key now. You won&apos;t be able to see it again!
                   </p>
                 </div>
               </div>
               <div className="mt-4 flex items-center gap-3">
-                <div className="flex-1 overflow-hidden rounded-xl border border-emerald-200 bg-white px-4 py-3">
-                  <code className="block truncate font-mono text-sm text-zinc-900">
+                <div className="flex-1 overflow-hidden rounded-xl border border-emerald-200/70 bg-white/80 px-4 py-3 dark:border-emerald-900/50 dark:bg-emerald-950/40">
+                  <code className="block truncate font-mono text-emerald-950 text-sm dark:text-emerald-100">
                     {newKey}
                   </code>
                 </div>
                 <Button
                   className={
                     copied
-                      ? 'bg-emerald-600 hover:bg-emerald-700'
-                      : 'bg-zinc-900 hover:bg-zinc-800'
+                      ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                      : 'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200'
                   }
                   onClick={handleCopyKey}
                 >
@@ -439,7 +502,7 @@ function SettingsPage() {
                 </Button>
               </div>
               <Button
-                className="mt-4 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800"
+                className="mt-4 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 dark:text-emerald-200 dark:hover:bg-emerald-900/40 dark:hover:text-emerald-100"
                 onClick={() => setNewKey(null)}
                 variant="ghost"
               >
@@ -450,7 +513,7 @@ function SettingsPage() {
         )}
 
         <div className="space-y-8">
-          <section className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all duration-200 hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-200/50">
+          <section className="group relative overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:border-foreground/15 hover:shadow-black/5 hover:shadow-lg dark:hover:shadow-black/30">
             <div className="p-6">
               <SectionHeader
                 description="Create API keys to authenticate the CLI with your account"
@@ -461,13 +524,13 @@ function SettingsPage() {
               <form className="mt-6" onSubmit={handleCreateKey}>
                 <div className="flex gap-3">
                   <Input
-                    className="flex-1 rounded-xl border-zinc-200 bg-zinc-50 px-4 py-3 transition-colors focus:border-zinc-300 focus:bg-white"
+                    className="flex-1 rounded-xl border-input bg-muted/60 px-4 py-3 transition-colors focus:border-ring focus:bg-background"
                     onChange={(e) => setKeyName(e.target.value)}
                     placeholder="Key name (e.g., MacBook Pro)"
                     value={keyName}
                   />
                   <Button
-                    className="rounded-xl bg-zinc-900 px-5 hover:bg-zinc-800"
+                    className="rounded-xl bg-foreground px-5 text-background hover:bg-foreground/90"
                     disabled={creating || !keyName.trim()}
                     type="submit"
                   >
@@ -555,6 +618,53 @@ function SettingsPage() {
                       }
                     />
                   </div>
+                </div>
+
+                <div className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-100">
+                        <HugeiconsIcon
+                          className="text-zinc-600"
+                          icon={Notification01Icon}
+                          size={18}
+                        />
+                      </div>
+                      <div>
+                        <p className="font-medium text-zinc-900">
+                          Test Notification
+                        </p>
+                        <p className="text-sm text-zinc-500">
+                          Send a sample notification to confirm everything works
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      className="rounded-xl bg-zinc-900 hover:bg-zinc-800"
+                      disabled={!canSendTestNotification}
+                      onClick={handleSendTestNotification}
+                    >
+                      {testNotificationStatus === 'sending'
+                        ? 'Sending...'
+                        : 'Send Test'}
+                    </Button>
+                  </div>
+                  {testUnavailableReason && (
+                    <p className="mt-3 text-xs text-zinc-500">
+                      {testUnavailableReason}
+                    </p>
+                  )}
+                  {testNotificationMessage && (
+                    <p
+                      className={`mt-3 text-xs ${
+                        testNotificationStatus === 'success'
+                          ? 'text-emerald-600'
+                          : 'text-red-600'
+                      }`}
+                    >
+                      {testNotificationMessage}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

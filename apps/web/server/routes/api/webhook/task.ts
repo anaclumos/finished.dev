@@ -1,7 +1,8 @@
 import { defineEventHandler, getHeader, HTTPError, readBody } from 'h3'
 
 export default defineEventHandler(async (event) => {
-  const convexUrl = process.env.VITE_CONVEX_URL
+  const convexUrl =
+    import.meta.env?.VITE_CONVEX_URL ?? process.env.VITE_CONVEX_URL
 
   if (!convexUrl) {
     throw new HTTPError('Server configuration error', { status: 500 })
