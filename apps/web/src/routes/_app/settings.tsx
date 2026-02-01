@@ -640,7 +640,7 @@ function SettingsPage() {
                       </div>
                     </div>
                     <Button
-                      className="rounded-xl bg-zinc-900 hover:bg-zinc-800"
+                      className="rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
                       disabled={!canSendTestNotification}
                       onClick={handleSendTestNotification}
                     >
