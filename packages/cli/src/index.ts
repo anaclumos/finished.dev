@@ -5,9 +5,10 @@ import { homedir } from 'node:os'
 import { join } from 'node:path'
 
 const VERSION = '0.2.0'
-const DEFAULT_SERVER_URL = 'https://finished.dev'
+const DEFAULT_SERVER_URL = 'https://www.finished.dev'
 const CONFIG_DIR = join(homedir(), '.finished')
 const CONFIG_FILE = join(CONFIG_DIR, 'config.json')
+const TRAILING_SLASH_RE = /\/$/
 
 interface Config {
   apiKey: string
@@ -125,6 +126,21 @@ function saveConfig(config: Config): void {
   writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2))
 }
 
+function normalizeServerUrl(url: string): string {
+  try {
+    const parsed = new URL(url)
+    if (parsed.hostname === 'finished.dev') {
+      parsed.hostname = 'www.finished.dev'
+    }
+    parsed.pathname = ''
+    parsed.search = ''
+    parsed.hash = ''
+    return parsed.toString().replace(TRAILING_SLASH_RE, '')
+  } catch {
+    return url
+  }
+}
+
 function generateMachineId(): string {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
   let id = ''
@@ -158,7 +174,8 @@ async function promptInput(prompt: string): Promise<string> {
 
 async function init(serverUrl: string): Promise<void> {
   console.log('\n🚀 finished CLI Setup\n')
-  console.log(`Server: ${serverUrl}`)
+  const normalizedServerUrl = normalizeServerUrl(serverUrl)
+  console.log(`Server: ${normalizedServerUrl}`)
   console.log('')
 
   const apiKey = await promptInput('Enter your API key: ')
@@ -175,7 +192,7 @@ async function init(serverUrl: string): Promise<void> {
 
   const config: Config = {
     apiKey,
-    serverUrl,
+    serverUrl: normalizedServerUrl,
     machineId: generateMachineId(),
   }
 
@@ -218,10 +235,11 @@ async function ping(
 
   const maxRetries = 3
   const backoffMs = 1000
+  const serverUrl = normalizeServerUrl(config.serverUrl)
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const url = `${config.serverUrl}/api/webhook/task`
+      const url = `${serverUrl}/api/webhook/task`
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -284,11 +302,12 @@ async function testConnection(): Promise<void> {
     process.exit(1)
   }
 
-  console.log(`\n🔍 Testing connection to ${config.serverUrl}...\n`)
+  const serverUrl = normalizeServerUrl(config.serverUrl)
+  console.log(`\n🔍 Testing connection to ${serverUrl}...\n`)
 
   try {
     // Test health endpoint
-    const healthResponse = await fetch(`${config.serverUrl}/api/health`)
+    const healthResponse = await fetch(`${serverUrl}/api/health`)
     if (healthResponse.ok) {
       console.log('✅ Server is reachable')
     } else {
@@ -297,7 +316,7 @@ async function testConnection(): Promise<void> {
     }
 
     // Test API key
-    const testResponse = await fetch(`${config.serverUrl}/api/webhook/task`, {
+    const testResponse = await fetch(`${serverUrl}/api/webhook/task`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -345,8 +364,9 @@ function showStatus(): void {
     return
   }
 
+  const serverUrl = normalizeServerUrl(config.serverUrl)
   console.log('\n📋 Current Configuration\n')
-  console.log(`   Server:     ${config.serverUrl}`)
+  console.log(`   Server:     ${serverUrl}`)
   console.log(`   API Key:    ${config.apiKey.substring(0, 12)}...`)
   console.log(`   Machine ID: ${config.machineId || 'not set'}`)
   console.log(`   Config:     ${CONFIG_FILE}`)
