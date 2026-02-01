@@ -2,6 +2,7 @@
 
 import { v } from 'convex/values'
 import webpush from 'web-push'
+import { internal } from './_generated/api'
 import { internalAction } from './_generated/server'
 
 /**
@@ -39,10 +40,12 @@ export const notifyAgentCompletion = internalAction({
     webpush.setVapidDetails(subject, publicKey, privateKey)
 
     // Query all push subscriptions for the target user
-    const subscriptions = await ctx.db
-      .query('pushSubscriptions')
-      .withIndex('by_userId', (q) => q.eq('userId', args.userId))
-      .collect()
+    const subscriptions = await ctx.runQuery(
+      internal.pushSubscriptionsInternal.listByUserId,
+      {
+        userId: args.userId,
+      }
+    )
 
     if (subscriptions.length === 0) {
       return {

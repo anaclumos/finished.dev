@@ -15,6 +15,7 @@ import type * as apiKeysInternal from "../apiKeysInternal.js";
 import type * as http from "../http.js";
 import type * as notifications from "../notifications.js";
 import type * as pushSubscriptions from "../pushSubscriptions.js";
+import type * as pushSubscriptionsInternal from "../pushSubscriptionsInternal.js";
 import type * as userSettings from "../userSettings.js";
 import type * as userSettingsInternal from "../userSettingsInternal.js";
 
@@ -32,6 +33,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   notifications: typeof notifications;
   pushSubscriptions: typeof pushSubscriptions;
+  pushSubscriptionsInternal: typeof pushSubscriptionsInternal;
   userSettings: typeof userSettings;
   userSettingsInternal: typeof userSettingsInternal;
 }>;
