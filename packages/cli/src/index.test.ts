@@ -55,14 +55,14 @@ describe('CLI Smoke Tests', () => {
     test('--version shows version and exits 0', async () => {
       const { output, exitCode } = await runCLI(['--version'])
 
-      expect(output.trim()).toBe('finished v0.2.0')
+      expect(output.trim()).toBe('finished v0.2.2')
       expect(exitCode).toBe(0)
     })
 
     test('-v shows version and exits 0', async () => {
       const { output, exitCode } = await runCLI(['-v'])
 
-      expect(output.trim()).toBe('finished v0.2.0')
+      expect(output.trim()).toBe('finished v0.2.2')
       expect(exitCode).toBe(0)
     })
   })

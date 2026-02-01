@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 
-const VERSION = '0.2.0'
+const VERSION = '0.2.2'
 const DEFAULT_SERVER_URL = 'https://www.finished.dev'
 const CONFIG_DIR = join(homedir(), '.finished')
 const CONFIG_FILE = join(CONFIG_DIR, 'config.json')
