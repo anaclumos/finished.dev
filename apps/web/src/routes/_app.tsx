@@ -12,12 +12,8 @@ import {
   useNavigate,
 } from '@tanstack/react-router'
 import { useConvexAuth, useMutation } from 'convex/react'
-import { useEffect } from 'react'
-import {
-  extractSubscriptionKeys,
-  initializePush,
-  isPushSupported,
-} from '@/lib/push'
+import { useEffect, useRef } from 'react'
+import { isPushSupported, subscribeToPush } from '@/lib/push'
 
 export const Route = createFileRoute('/_app')({
   component: AppLayout,
@@ -35,21 +31,26 @@ function AppLayout() {
   const upsertSubscription = useMutation(
     api.pushSubscriptions.upsertSubscription
   )
+  const hasSubscribed = useRef(false)
 
   useEffect(() => {
-    if (!isAuthenticated || isLoading) {
+    if (!isAuthenticated || isLoading || hasSubscribed.current) {
+      return
+    }
+
+    if (!isPushSupported()) {
+      return
+    }
+
+    if (Notification.permission !== 'granted') {
       return
     }
 
     const setupPush = async () => {
-      if (!isPushSupported()) {
-        return
-      }
-
       try {
-        const subscription = await initializePush()
-        if (subscription) {
-          const keys = extractSubscriptionKeys(subscription)
+        const keys = await subscribeToPush()
+        if (keys) {
+          hasSubscribed.current = true
           await upsertSubscription({
             endpoint: keys.endpoint,
             p256dh: keys.p256dh,

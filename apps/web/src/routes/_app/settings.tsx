@@ -22,7 +22,6 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
-  extractSubscriptionKeys,
   getPermissionStatus,
   isPushSupported,
   subscribeToPush,
@@ -326,9 +325,19 @@ function SettingsPage() {
   const handleEnableNotifications = async () => {
     setSubscribing(true)
     try {
-      const subscription = await subscribeToPush()
-      if (subscription) {
-        const keys = extractSubscriptionKeys(subscription)
+      if (Notification.permission === 'default') {
+        const result = await Notification.requestPermission()
+        if (result !== 'granted') {
+          setPushStatus(getPermissionStatus())
+          return
+        }
+      } else if (Notification.permission === 'denied') {
+        setPushStatus('denied')
+        return
+      }
+
+      const keys = await subscribeToPush()
+      if (keys) {
         await upsertSubscription({
           endpoint: keys.endpoint,
           p256dh: keys.p256dh,
