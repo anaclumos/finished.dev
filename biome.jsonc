@@ -23,6 +23,16 @@
       }
     },
     {
+      "includes": ["apps/web/src/routes/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useFilenamingConvention": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["packages/cli/**"],
       "linter": {
         "rules": {
