@@ -176,9 +176,7 @@ http.route({
 http.route({
   path: '/api/health',
   method: 'GET',
-  handler: httpAction(async (ctx, request) => {
-    void ctx
-    void request
+  handler: httpAction((_ctx, _request) => {
     return new Response(
       JSON.stringify({ status: 'ok', timestamp: Date.now() }),
       {

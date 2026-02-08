@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 
-const VERSION = '0.2.2'
+const VERSION = '0.2.3'
 const DEFAULT_SERVER_URL = 'https://www.finished.dev'
 const CONFIG_DIR = join(homedir(), '.finished')
 const CONFIG_FILE = join(CONFIG_DIR, 'config.json')
@@ -150,6 +150,63 @@ function generateMachineId(): string {
   return id
 }
 
+async function readResponseText(
+  response: Response
+): Promise<string | undefined> {
+  try {
+    return await response.text()
+  } catch {
+    return undefined
+  }
+}
+
+function safeParseJson(text: string | undefined): unknown | undefined {
+  if (!text) {
+    return undefined
+  }
+  const trimmed = text.trim()
+  if (!trimmed) {
+    return undefined
+  }
+  try {
+    return JSON.parse(trimmed) as unknown
+  } catch {
+    return undefined
+  }
+}
+
+function extractErrorMessage(payload: unknown): string | undefined {
+  if (payload == null) {
+    return undefined
+  }
+  if (typeof payload === 'string') {
+    return payload
+  }
+  if (typeof payload !== 'object') {
+    return undefined
+  }
+
+  const obj = payload as Record<string, unknown>
+
+  const error = obj.error
+  if (typeof error === 'string') {
+    return error
+  }
+  if (error && typeof error === 'object') {
+    const nested = (error as Record<string, unknown>).message
+    if (typeof nested === 'string') {
+      return nested
+    }
+  }
+
+  const message = obj.message
+  if (typeof message === 'string') {
+    return message
+  }
+
+  return undefined
+}
+
 async function promptInput(prompt: string): Promise<string> {
   process.stdout.write(prompt)
   const reader = Bun.stdin.stream().getReader()
@@ -250,30 +307,38 @@ async function ping(
       })
 
       if (response.ok) {
-        await response.json()
         console.log(`✅ ${message}`)
         return
       }
 
-      const error = (await response.json().catch(() => ({}))) as Record<
-        string,
-        unknown
-      >
+      const text = await readResponseText(response)
+      const json = safeParseJson(text)
+      const trimmedText = text?.trim()
+      const errorMessage =
+        extractErrorMessage(json) ||
+        (trimmedText ? trimmedText.slice(0, 200) : undefined)
+
       if (response.status === 401) {
         console.error(
-          `❌ Authentication failed: ${error.error || 'Invalid API key'}`
+          `❌ Authentication failed: ${
+            errorMessage || response.statusText || 'Invalid API key'
+          }`
         )
         console.error('   Run "finished init" to reconfigure')
         process.exit(1)
       }
 
       if (response.status >= 400 && response.status < 500) {
-        console.error(`❌ Request error: ${error.error || response.statusText}`)
+        console.error(
+          `❌ Request error: ${errorMessage || response.statusText || 'Error'}`
+        )
         process.exit(1)
       }
 
       // Server error, retry
-      throw new Error(`Server error: ${response.status}`)
+      throw new Error(
+        `Server error: ${response.status}${errorMessage ? ` - ${errorMessage}` : ''}`
+      )
     } catch (_error) {
       if (attempt < maxRetries) {
         const delay = backoffMs * attempt
@@ -337,13 +402,16 @@ async function testConnection(): Promise<void> {
         '\n🎉 Everything is working! You should receive a push notification.'
       )
     } else {
-      const error = (await testResponse.json().catch(() => ({}))) as Record<
-        string,
-        unknown
-      >
+      const text = await readResponseText(testResponse)
+      const json = safeParseJson(text)
+      const trimmedText = text?.trim()
+      const errorMessage =
+        extractErrorMessage(json) ||
+        (trimmedText ? trimmedText.slice(0, 200) : undefined)
+
       console.error(
         '❌ API key validation failed:',
-        error.error || testResponse.statusText
+        errorMessage || testResponse.statusText || 'Error'
       )
       process.exit(1)
     }
