@@ -210,10 +210,10 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
  */
 export async function initializePush(
   onSubscription?: (subscription: PushSubscription) => void
-): Promise<void> {
+): Promise<PushSubscription | null> {
   if (!isPushSupported()) {
     console.warn('[Push] Push notifications not supported in this browser')
-    return
+    return null
   }
 
   // Register service worker
@@ -225,4 +225,6 @@ export async function initializePush(
   if (subscription && onSubscription) {
     onSubscription(subscription)
   }
+
+  return subscription
 }

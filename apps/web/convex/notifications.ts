@@ -2,13 +2,21 @@ import { v } from 'convex/values'
 import { internal } from './_generated/api'
 import { action } from './_generated/server'
 
-export const sendTestNotification = action({
+type SendTestNotificationResult = {
+  success: boolean
+  sent: number
+  failed: number
+  message?: string
+  errors?: string[]
+}
+
+export const sendTestNotification: ReturnType<typeof action> = action({
   args: {
     title: v.optional(v.string()),
     body: v.optional(v.string()),
     url: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<SendTestNotificationResult> => {
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
       throw new Error('Unauthenticated')
