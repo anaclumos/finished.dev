@@ -65,9 +65,29 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
 }
 
 /**
+ * Extract keys from a PushSubscription via toJSON() (base64url encoding
+ * matching web-push library expectations).
+ */
+function extractKeys(subscription: PushSubscription): {
+  endpoint: string
+  p256dh: string
+  auth: string
+} | null {
+  const json = subscription.toJSON()
+  if (json.endpoint && json.keys) {
+    return {
+      endpoint: json.endpoint,
+      p256dh: json.keys.p256dh ?? '',
+      auth: json.keys.auth ?? '',
+    }
+  }
+  return null
+}
+
+/**
  * Subscribe to push notifications.
- * Explicitly registers SW, unsubscribes any existing subscription,
- * then creates a fresh one. Returns keys via toJSON() (base64url).
+ * Reuses existing browser subscription if available, otherwise creates new.
+ * Returns keys via toJSON() (base64url).
  */
 export async function subscribeToPush(): Promise<{
   endpoint: string
@@ -88,10 +108,10 @@ export async function subscribeToPush(): Promise<{
   await navigator.serviceWorker.ready
 
   try {
-    // Unsubscribe existing before creating new (prevents stale subscriptions)
+    // Reuse existing subscription if available (prevents invalidating stored endpoints)
     const existing = await registration.pushManager.getSubscription()
     if (existing) {
-      await existing.unsubscribe()
+      return extractKeys(existing)
     }
 
     const subscription = await registration.pushManager.subscribe({
@@ -99,17 +119,7 @@ export async function subscribeToPush(): Promise<{
       applicationServerKey: urlBase64ToUint8Array(publicKey) as BufferSource,
     })
 
-    // Use toJSON() for base64url-encoded keys (matches web-push expectations)
-    const json = subscription.toJSON()
-    if (json.endpoint && json.keys) {
-      return {
-        endpoint: json.endpoint,
-        p256dh: json.keys.p256dh ?? '',
-        auth: json.keys.auth ?? '',
-      }
-    }
-
-    return null
+    return extractKeys(subscription)
   } catch (error) {
     console.error('[Push] Failed to subscribe:', error)
     return null

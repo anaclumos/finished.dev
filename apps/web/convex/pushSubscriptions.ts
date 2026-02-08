@@ -1,7 +1,7 @@
-import { mutationGeneric } from 'convex/server'
 import { v } from 'convex/values'
+import { mutation } from './_generated/server'
 
-export const upsertSubscription = mutationGeneric({
+export const upsertSubscription = mutation({
   args: {
     endpoint: v.string(),
     p256dh: v.string(),
@@ -40,7 +40,7 @@ export const upsertSubscription = mutationGeneric({
   },
 })
 
-export const removeSubscription = mutationGeneric({
+export const removeSubscription = mutation({
   args: {
     endpoint: v.string(),
   },
