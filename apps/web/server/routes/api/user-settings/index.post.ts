@@ -1,33 +1,24 @@
 import { requireAuth } from '@server/utils/auth'
 import { eq } from 'drizzle-orm'
 import { createError, defineEventHandler, readBody } from 'h3'
+import { z } from 'zod'
 import { db } from '@/lib/db'
 import { userSettings } from '@/lib/schema'
 
+const updateSettingsSchema = z.object({
+  pushEnabled: z.boolean().optional(),
+  soundEnabled: z.boolean().optional(),
+})
+
 export default defineEventHandler(async (event) => {
   const session = await requireAuth(event)
-  const body = await readBody<{
-    pushEnabled?: unknown
-    soundEnabled?: unknown
-  }>(event)
+  const body = await readBody(event)
 
-  if (
-    body?.pushEnabled !== undefined &&
-    typeof body.pushEnabled !== 'boolean'
-  ) {
+  const parsed = updateSettingsSchema.safeParse(body)
+  if (!parsed.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'pushEnabled must be a boolean',
-    })
-  }
-
-  if (
-    body?.soundEnabled !== undefined &&
-    typeof body.soundEnabled !== 'boolean'
-  ) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'soundEnabled must be a boolean',
+      statusMessage: parsed.error.issues[0]?.message ?? 'Invalid request body',
     })
   }
 
@@ -43,8 +34,8 @@ export default defineEventHandler(async (event) => {
     const updated = await db
       .update(userSettings)
       .set({
-        pushEnabled: body?.pushEnabled ?? current.pushEnabled,
-        soundEnabled: body?.soundEnabled ?? current.soundEnabled,
+        pushEnabled: parsed.data.pushEnabled ?? current.pushEnabled,
+        soundEnabled: parsed.data.soundEnabled ?? current.soundEnabled,
         updatedAt: new Date(),
       })
       .where(eq(userSettings.id, current.id))
@@ -57,8 +48,8 @@ export default defineEventHandler(async (event) => {
     .insert(userSettings)
     .values({
       userId: session.user.id,
-      pushEnabled: body?.pushEnabled ?? true,
-      soundEnabled: body?.soundEnabled ?? true,
+      pushEnabled: parsed.data.pushEnabled ?? true,
+      soundEnabled: parsed.data.soundEnabled ?? true,
       updatedAt: new Date(),
     })
     .returning()

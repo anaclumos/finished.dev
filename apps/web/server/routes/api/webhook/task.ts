@@ -1,22 +1,20 @@
+import { sha256Hex } from '@server/utils/crypto'
+import { sendTaskPushIfEnabled } from '@server/utils/push'
 import { eq } from 'drizzle-orm'
 import { createError, defineEventHandler, getHeader, readBody } from 'h3'
 import { ulid } from 'ulid'
-import webpush from 'web-push'
+import { z } from 'zod'
 import { db } from '@/lib/db'
-import {
-  agentTasks,
-  apiKeys,
-  pushSubscriptions,
-  userSettings,
-} from '@/lib/schema'
+import { agentTasks, apiKeys } from '@/lib/schema'
 
-async function sha256Hex(value: string): Promise<string> {
-  const data = new TextEncoder().encode(value)
-  const digest = await crypto.subtle.digest('SHA-256', data)
-  return Array.from(new Uint8Array(digest))
-    .map((byte) => byte.toString(16).padStart(2, '0'))
-    .join('')
-}
+const taskBodySchema = z.object({
+  title: z.string().trim().min(1, 'title is required'),
+  status: z.string().trim().min(1, 'status is required'),
+  duration: z.number().finite().nonnegative().optional(),
+  metadata: z.unknown().optional(),
+  source: z.string().optional(),
+  machineId: z.string().optional(),
+})
 
 function getBearerApiKey(authHeader: string | undefined): string {
   if (!authHeader) {
@@ -37,130 +35,14 @@ function getBearerApiKey(authHeader: string | undefined): string {
   return token
 }
 
-function normalizeTaskBody(body: {
-  title?: unknown
-  status?: unknown
-  duration?: unknown
-  metadata?: unknown
-  source?: unknown
-  machineId?: unknown
-}) {
-  if (
-    !body ||
-    typeof body.title !== 'string' ||
-    body.title.trim().length === 0
-  ) {
-    throw createError({ statusCode: 400, statusMessage: 'title is required' })
-  }
-
-  if (
-    !body ||
-    typeof body.status !== 'string' ||
-    body.status.trim().length === 0
-  ) {
-    throw createError({ statusCode: 400, statusMessage: 'status is required' })
-  }
-
-  if (
-    body.duration !== undefined &&
-    (typeof body.duration !== 'number' ||
-      !Number.isFinite(body.duration) ||
-      body.duration < 0)
-  ) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'duration must be a non-negative number',
-    })
-  }
-
-  if (body.source !== undefined && typeof body.source !== 'string') {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'source must be a string',
-    })
-  }
-
-  if (body.machineId !== undefined && typeof body.machineId !== 'string') {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'machineId must be a string',
-    })
-  }
-
-  return {
-    title: body.title.trim(),
-    status: body.status.trim(),
-    duration: body.duration,
-    metadata: body.metadata,
-    source: typeof body.source === 'string' ? body.source : null,
-    machineId: typeof body.machineId === 'string' ? body.machineId : null,
-  }
-}
-
-async function sendTaskPushIfEnabled(input: {
-  userId: string
-  title: string
-  status: string
-}) {
-  const settings = await db
-    .select({ pushEnabled: userSettings.pushEnabled })
-    .from(userSettings)
-    .where(eq(userSettings.userId, input.userId))
-    .limit(1)
-
-  const shouldSendPush = settings[0]?.pushEnabled ?? true
-  if (!shouldSendPush) {
-    return
-  }
-
-  const subscriptions = await db
-    .select()
-    .from(pushSubscriptions)
-    .where(eq(pushSubscriptions.userId, input.userId))
-
-  if (subscriptions.length === 0) {
-    return
-  }
-
-  const vapidEmail = process.env.WEB_PUSH_EMAIL
-  const vapidPublicKey = process.env.VITE_WEB_PUSH_PUBLIC_KEY
-  const vapidPrivateKey = process.env.WEB_PUSH_PRIVATE_KEY
-  if (!(vapidEmail && vapidPublicKey && vapidPrivateKey)) {
-    return
-  }
-
-  const subject = vapidEmail.startsWith('mailto:')
-    ? vapidEmail
-    : `mailto:${vapidEmail}`
-
-  webpush.setVapidDetails(subject, vapidPublicKey, vapidPrivateKey)
-
-  const payload = JSON.stringify({
-    title: input.title,
-    body: `Task ${input.status}: ${input.title}`,
-    url: '/dashboard',
-  })
-
-  await Promise.allSettled(
-    subscriptions.map((subscription) =>
-      webpush.sendNotification(
-        {
-          endpoint: subscription.endpoint,
-          keys: {
-            p256dh: subscription.p256dh,
-            auth: subscription.auth,
-          },
-        },
-        payload
-      )
-    )
-  )
-}
-
 export default defineEventHandler(async (event) => {
   const authHeader = getHeader(event, 'authorization')
   const rawApiKey = getBearerApiKey(authHeader)
-  const keyHash = await sha256Hex(rawApiKey)
+
+  const [keyHash, body] = await Promise.all([
+    sha256Hex(rawApiKey),
+    readBody(event),
+  ])
 
   const keyMatch = await db
     .select()
@@ -173,35 +55,36 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Invalid API key' })
   }
 
-  await db
-    .update(apiKeys)
-    .set({ lastUsedAt: new Date() })
-    .where(eq(apiKeys.id, apiKey.id))
-
-  const body = await readBody<{
-    title?: unknown
-    status?: unknown
-    duration?: unknown
-    metadata?: unknown
-    source?: unknown
-    machineId?: unknown
-  }>(event)
-  const taskInput = normalizeTaskBody(body)
-
-  const inserted = await db
-    .insert(agentTasks)
-    .values({
-      id: ulid(),
-      userId: apiKey.userId,
-      apiKeyId: apiKey.id,
-      title: taskInput.title,
-      status: taskInput.status,
-      duration: taskInput.duration,
-      metadata: taskInput.metadata,
-      source: taskInput.source,
-      machineId: taskInput.machineId,
+  const parsed = taskBodySchema.safeParse(body)
+  if (!parsed.success) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: parsed.error.issues[0]?.message ?? 'Invalid request body',
     })
-    .returning({ id: agentTasks.id })
+  }
+
+  const taskInput = parsed.data
+
+  const [inserted] = await Promise.all([
+    db
+      .insert(agentTasks)
+      .values({
+        id: ulid(),
+        userId: apiKey.userId,
+        apiKeyId: apiKey.id,
+        title: taskInput.title,
+        status: taskInput.status,
+        duration: taskInput.duration,
+        metadata: taskInput.metadata,
+        source: taskInput.source ?? null,
+        machineId: taskInput.machineId ?? null,
+      })
+      .returning({ id: agentTasks.id }),
+    db
+      .update(apiKeys)
+      .set({ lastUsedAt: new Date() })
+      .where(eq(apiKeys.id, apiKey.id)),
+  ])
 
   const taskId = inserted[0]?.id
   if (!taskId) {
@@ -211,7 +94,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await sendTaskPushIfEnabled({
+  // Fire-and-forget: don't await push notification
+  sendTaskPushIfEnabled({
     userId: apiKey.userId,
     title: taskInput.title,
     status: taskInput.status,

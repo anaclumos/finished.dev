@@ -1,6 +1,5 @@
 import {
   Activity01Icon,
-  AlertCircleIcon,
   ArrowDown01Icon,
   ArrowUp01Icon,
   Cancel01Icon,
@@ -14,73 +13,12 @@ import { useLiveQuery } from '@tanstack/react-db'
 import { createFileRoute } from '@tanstack/react-router'
 import { Badge } from '@/components/ui/badge'
 import { agentTasksCollection } from '@/lib/collections'
+import { statusConfig } from '@/lib/constants'
+import { formatDuration, formatRelativeTime } from '@/lib/formatters'
 
 export const Route = createFileRoute('/_app/dashboard')({
   component: DashboardPage,
 })
-
-function formatRelativeTime(timestamp: number): string {
-  const now = Date.now()
-  const diff = now - timestamp
-  const seconds = Math.floor(diff / 1000)
-  const minutes = Math.floor(seconds / 60)
-  const hours = Math.floor(minutes / 60)
-  const days = Math.floor(hours / 24)
-
-  if (seconds < 60) {
-    return 'just now'
-  }
-  if (minutes < 60) {
-    return `${minutes}m ago`
-  }
-  if (hours < 24) {
-    return `${hours}h ago`
-  }
-  if (days < 7) {
-    return `${days}d ago`
-  }
-  return new Date(timestamp).toLocaleDateString()
-}
-
-function formatDuration(ms: number): string {
-  if (ms < 1000) {
-    return `${ms}ms`
-  }
-  if (ms < 60_000) {
-    return `${(ms / 1000).toFixed(1)}s`
-  }
-  if (ms < 3_600_000) {
-    return `${(ms / 60_000).toFixed(1)}m`
-  }
-  return `${(ms / 3_600_000).toFixed(1)}h`
-}
-
-const statusConfig = {
-  success: {
-    icon: CheckmarkCircle02Icon,
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-500/10',
-    ringColor: 'ring-emerald-500/20',
-    label: 'Success',
-    badgeClass: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
-  },
-  failure: {
-    icon: Cancel01Icon,
-    color: 'text-red-600',
-    bg: 'bg-red-500/10',
-    ringColor: 'ring-red-500/20',
-    label: 'Failed',
-    badgeClass: 'bg-red-500/10 text-red-600 border-red-500/20',
-  },
-  cancelled: {
-    icon: AlertCircleIcon,
-    color: 'text-amber-600',
-    bg: 'bg-amber-500/10',
-    ringColor: 'ring-amber-500/20',
-    label: 'Cancelled',
-    badgeClass: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
-  },
-}
 
 function StatCard({
   title,
@@ -167,7 +105,7 @@ function TaskRow({
     title: string
     status: string
     createdAt: string | number | Date
-    source?: string
+    source?: string | null
     duration?: number | null
   }
 }) {

@@ -41,19 +41,6 @@
           }
         }
       }
-    },
-    {
-      "includes": ["apps/web/src/routes/_app/settings.tsx"],
-      "linter": {
-        "rules": {
-          "complexity": {
-            "noExcessiveCognitiveComplexity": "off"
-          },
-          "suspicious": {
-            "noAlert": "off"
-          }
-        }
-      }
     }
   ]
 }

@@ -19,8 +19,8 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
-    sendVerificationEmail({ user, url }) {
-      resend.emails.send({
+    async sendVerificationEmail({ user, url }) {
+      await resend.emails.send({
         from: 'finished.dev <this@is.finished.dev>',
         to: [user.email],
         subject: 'Verify your email address',

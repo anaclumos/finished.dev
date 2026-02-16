@@ -9,11 +9,38 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
+import type { ComponentProps } from 'react'
 import { CodeBlock, InlineCode } from '@/components/code-block'
 import { Button } from '@/components/ui/button'
 import { useSession } from '@/lib/auth-client'
 
 export const Route = createFileRoute('/')({ component: LandingPage })
+
+function AuthCTA({
+  signedOutTo,
+  signedOutLabel,
+  signedInTo,
+  signedInLabel,
+  session,
+  isPending,
+  ...buttonProps
+}: {
+  signedOutTo: string
+  signedOutLabel: string
+  signedInTo: string
+  signedInLabel: string
+  session: unknown
+  isPending: boolean
+} & Omit<ComponentProps<typeof Button>, 'children'>) {
+  const isSignedIn = !isPending && !!session
+  return (
+    <Link to={isSignedIn ? signedInTo : signedOutTo}>
+      <Button {...buttonProps}>
+        {isSignedIn ? signedInLabel : signedOutLabel}
+      </Button>
+    </Link>
+  )
+}
 
 const features = [
   {
@@ -86,25 +113,16 @@ function LandingPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            {isPending && (
-              <Link
-                className="font-medium text-sm text-zinc-600 hover:text-zinc-900"
-                to="/sign-in"
-              >
-                Sign In
-              </Link>
-            )}
-            {!(isPending || session) && (
-              <Link
-                className="font-medium text-sm text-zinc-600 hover:text-zinc-900"
-                to="/sign-in"
-              >
-                Sign In
-              </Link>
-            )}
-            {!isPending && session && (
+            {!isPending && session ? (
               <Link to="/dashboard">
                 <Button size="sm">Open Dashboard</Button>
+              </Link>
+            ) : (
+              <Link
+                className="font-medium text-sm text-zinc-600 hover:text-zinc-900"
+                to="/sign-in"
+              >
+                Sign In
               </Link>
             )}
           </div>
@@ -136,21 +154,15 @@ function LandingPage() {
             </p>
 
             <div className="mt-10 flex items-center justify-center gap-4">
-              {isPending && (
-                <Link to="/sign-up">
-                  <Button size="lg">Get Started</Button>
-                </Link>
-              )}
-              {!(isPending || session) && (
-                <Link to="/sign-up">
-                  <Button size="lg">Get Started</Button>
-                </Link>
-              )}
-              {!isPending && session && (
-                <Link to="/dashboard">
-                  <Button size="lg">Open Dashboard</Button>
-                </Link>
-              )}
+              <AuthCTA
+                isPending={isPending}
+                session={session}
+                signedInLabel="Open Dashboard"
+                signedInTo="/dashboard"
+                signedOutLabel="Get Started"
+                signedOutTo="/sign-up"
+                size="lg"
+              />
             </div>
 
             {/* CLI Preview */}
@@ -284,16 +296,14 @@ function LandingPage() {
               </div>
 
               <div className="mt-10">
-                {isPending && (
-                  <Link to="/sign-up">
-                    <Button>Get Started</Button>
-                  </Link>
-                )}
-                {!(isPending || session) && (
-                  <Link to="/sign-up">
-                    <Button>Get Started</Button>
-                  </Link>
-                )}
+                <AuthCTA
+                  isPending={isPending}
+                  session={session}
+                  signedInLabel="Get Started"
+                  signedInTo="/sign-up"
+                  signedOutLabel="Get Started"
+                  signedOutTo="/sign-up"
+                />
               </div>
             </div>
 
@@ -373,36 +383,16 @@ function LandingPage() {
             Completes. No Credit Card Required.
           </p>
           <div className="mt-10">
-            {isPending && (
-              <Link to="/sign-up">
-                <Button
-                  className="bg-white text-zinc-900 hover:bg-zinc-100"
-                  size="lg"
-                >
-                  Get Started
-                </Button>
-              </Link>
-            )}
-            {!(isPending || session) && (
-              <Link to="/sign-up">
-                <Button
-                  className="bg-white text-zinc-900 hover:bg-zinc-100"
-                  size="lg"
-                >
-                  Get Started
-                </Button>
-              </Link>
-            )}
-            {!isPending && session && (
-              <Link to="/dashboard">
-                <Button
-                  className="bg-white text-zinc-900 hover:bg-zinc-100"
-                  size="lg"
-                >
-                  Open Dashboard
-                </Button>
-              </Link>
-            )}
+            <AuthCTA
+              className="bg-white text-zinc-900 hover:bg-zinc-100"
+              isPending={isPending}
+              session={session}
+              signedInLabel="Open Dashboard"
+              signedInTo="/dashboard"
+              signedOutLabel="Get Started"
+              signedOutTo="/sign-up"
+              size="lg"
+            />
           </div>
         </div>
       </section>

@@ -19,12 +19,18 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { apiKeysCollection, userSettingsCollection } from '@/lib/collections'
+import {
+  type ApiKey,
+  apiKeysCollection,
+  userSettingsCollection,
+} from '@/lib/collections'
+import { formatDate } from '@/lib/formatters'
 import {
   getPermissionStatus,
   isPushSupported,
   subscribeToPush,
 } from '@/lib/push'
+import { getQueryClient } from '@/lib/query-client'
 
 export const Route = createFileRoute('/_app/settings')({
   component: SettingsPage,
@@ -79,14 +85,6 @@ function ToggleSwitch({
       />
     </button>
   )
-}
-
-interface ApiKey {
-  id: string
-  name: string
-  keyPrefix: string
-  createdAt: string | number | Date
-  lastUsedAt?: string | number | Date | null
 }
 
 function ApiKeysList({
@@ -274,7 +272,7 @@ function PushStatusBanner({
   )
 }
 
-function SettingsPage() {
+function useSettings() {
   const { data: apiKeysData } = useLiveQuery((q) =>
     q
       .from({ key: apiKeysCollection })
@@ -417,7 +415,7 @@ function SettingsPage() {
       const result = (await res.json()) as { key: string }
       setNewKey(result.key)
       setKeyName('')
-      apiKeysCollection.invalidate()
+      getQueryClient().invalidateQueries({ queryKey: ['api-keys'] })
     } catch (error) {
       console.error('Failed to create API key:', error)
     } finally {
@@ -435,9 +433,14 @@ function SettingsPage() {
   }
 
   const handleDeleteKey = async (id: string) => {
-    const confirmed = globalThis.confirm(
-      'Are you sure you want to delete this API key? This cannot be undone.'
-    )
+    const confirmAction = Reflect.get(globalThis, 'confirm')
+    const confirmed =
+      typeof confirmAction === 'function'
+        ? confirmAction.call(
+            globalThis,
+            'Are you sure you want to delete this API key? This cannot be undone.'
+          )
+        : false
     if (!confirmed) {
       return
     }
@@ -449,7 +452,7 @@ function SettingsPage() {
       if (!res.ok) {
         throw new Error('Failed to delete API key.')
       }
-      apiKeysCollection.invalidate()
+      getQueryClient().invalidateQueries({ queryKey: ['api-keys'] })
     } catch (error) {
       console.error('Failed to delete API key:', error)
     }
@@ -469,7 +472,7 @@ function SettingsPage() {
       if (!res.ok) {
         throw new Error('Failed to update settings.')
       }
-      userSettingsCollection.invalidate()
+      getQueryClient().invalidateQueries({ queryKey: ['user-settings'] })
     } catch (error) {
       console.error('Failed to update settings:', error)
     }
@@ -492,14 +495,6 @@ function SettingsPage() {
     }
   }
 
-  const formatDate = (timestamp: string | number | Date) => {
-    return new Date(timestamp).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
-  }
-
   const pushEnabled = settings?.pushEnabled ?? true
   const testUnavailableReason = (() => {
     if (pushStatus !== 'granted') {
@@ -515,6 +510,54 @@ function SettingsPage() {
     pushEnabled &&
     !subscribing &&
     testNotificationStatus !== 'sending'
+
+  return {
+    apiKeys,
+    settings,
+    keyName,
+    setKeyName,
+    creating,
+    newKey,
+    setNewKey,
+    copied,
+    pushStatus,
+    subscribing,
+    testNotificationStatus,
+    testNotificationMessage,
+    canSendTestNotification,
+    testUnavailableReason,
+    handleCreateKey,
+    handleCopyKey,
+    handleDeleteKey,
+    handleUpdateSettings,
+    handleEnableNotifications,
+    handleSendTestNotification,
+  }
+}
+
+function SettingsPage() {
+  const {
+    apiKeys,
+    settings,
+    keyName,
+    setKeyName,
+    creating,
+    newKey,
+    setNewKey,
+    copied,
+    pushStatus,
+    subscribing,
+    testNotificationStatus,
+    testNotificationMessage,
+    canSendTestNotification,
+    testUnavailableReason,
+    handleCreateKey,
+    handleCopyKey,
+    handleDeleteKey,
+    handleUpdateSettings,
+    handleEnableNotifications,
+    handleSendTestNotification,
+  } = useSettings()
 
   return (
     <div className="min-h-screen bg-zinc-50/50 p-8">

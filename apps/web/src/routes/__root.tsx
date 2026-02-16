@@ -2,8 +2,8 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { Analytics } from '@vercel/analytics/react'
-import { AuthProvider } from '../providers/auth-provider'
 
+import { Providers } from '@/providers/auth-provider'
 import appCss from '../styles.css?url'
 
 export const Route = createRootRoute({
@@ -101,7 +101,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <Providers>{children}</Providers>
         <Analytics />
         <TanStackDevtools
           config={{

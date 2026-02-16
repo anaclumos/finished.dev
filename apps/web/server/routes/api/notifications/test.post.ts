@@ -1,49 +1,31 @@
 import { requireAuth } from '@server/utils/auth'
+import { ensureVapidConfigured } from '@server/utils/push'
 import { eq } from 'drizzle-orm'
 import { createError, defineEventHandler, readBody } from 'h3'
 import webpush from 'web-push'
+import { z } from 'zod'
 import { db } from '@/lib/db'
 import { pushSubscriptions } from '@/lib/schema'
 
-function readRequiredEnv(name: string): string {
-  const value = process.env[name]
-  if (!value) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: `${name} is not configured`,
-    })
-  }
-  return value
-}
+const testNotificationSchema = z.object({
+  title: z.string().optional(),
+  body: z.string().optional(),
+  url: z.string().optional(),
+})
 
 export default defineEventHandler(async (event) => {
   const session = await requireAuth(event)
-  const body = await readBody<{
-    title?: unknown
-    body?: unknown
-    url?: unknown
-  }>(event)
+  const raw = await readBody(event)
 
-  if (body?.title !== undefined && typeof body.title !== 'string') {
+  const parsed = testNotificationSchema.safeParse(raw)
+  if (!parsed.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'title must be a string',
+      statusMessage: parsed.error.issues[0]?.message ?? 'Invalid request body',
     })
   }
 
-  if (body?.body !== undefined && typeof body.body !== 'string') {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'body must be a string',
-    })
-  }
-
-  if (body?.url !== undefined && typeof body.url !== 'string') {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'url must be a string',
-    })
-  }
+  const body = parsed.data
 
   const subscriptions = await db
     .select()
@@ -54,22 +36,17 @@ export default defineEventHandler(async (event) => {
     return { success: true, sent: 0 }
   }
 
-  const vapidEmail = readRequiredEnv('WEB_PUSH_EMAIL')
-  const vapidPublicKey = readRequiredEnv('VITE_WEB_PUSH_PUBLIC_KEY')
-  const vapidPrivateKey = readRequiredEnv('WEB_PUSH_PRIVATE_KEY')
-  const subject = vapidEmail.startsWith('mailto:')
-    ? vapidEmail
-    : `mailto:${vapidEmail}`
-
-  webpush.setVapidDetails(subject, vapidPublicKey, vapidPrivateKey)
+  if (!ensureVapidConfigured()) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Web Push is not configured',
+    })
+  }
 
   const payload = JSON.stringify({
-    title: typeof body?.title === 'string' ? body.title : 'Test notification',
-    body:
-      typeof body?.body === 'string'
-        ? body.body
-        : 'This is a test notification from finished.dev',
-    url: typeof body?.url === 'string' ? body.url : '/dashboard',
+    title: body.title ?? 'Test notification',
+    body: body.body ?? 'This is a test notification from finished.dev',
+    url: body.url ?? '/dashboard',
   })
 
   const results = await Promise.allSettled(
