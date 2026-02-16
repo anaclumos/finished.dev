@@ -16,8 +16,6 @@ import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AuthSignUpRouteRouteImport } from './routes/_auth/sign-up/route'
 import { Route as AuthSignInRouteRouteImport } from './routes/_auth/sign-in/route'
-import { Route as AuthSignUpSplatRouteImport } from './routes/_auth/sign-up/$'
-import { Route as AuthSignInSplatRouteImport } from './routes/_auth/sign-in/$'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
@@ -52,66 +50,36 @@ const AuthSignInRouteRoute = AuthSignInRouteRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthSignUpSplatRoute = AuthSignUpSplatRouteImport.update({
-  id: '/$',
-  path: '/$',
-  getParentRoute: () => AuthSignUpRouteRoute,
-} as any)
-const AuthSignInSplatRoute = AuthSignInSplatRouteImport.update({
-  id: '/$',
-  path: '/$',
-  getParentRoute: () => AuthSignInRouteRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/sign-in': typeof AuthSignInRouteRouteWithChildren
-  '/sign-up': typeof AuthSignUpRouteRouteWithChildren
+  '/sign-in': typeof AuthSignInRouteRoute
+  '/sign-up': typeof AuthSignUpRouteRoute
   '/dashboard': typeof AppDashboardRoute
   '/settings': typeof AppSettingsRoute
-  '/sign-in/$': typeof AuthSignInSplatRoute
-  '/sign-up/$': typeof AuthSignUpSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/sign-in': typeof AuthSignInRouteRouteWithChildren
-  '/sign-up': typeof AuthSignUpRouteRouteWithChildren
+  '/sign-in': typeof AuthSignInRouteRoute
+  '/sign-up': typeof AuthSignUpRouteRoute
   '/dashboard': typeof AppDashboardRoute
   '/settings': typeof AppSettingsRoute
-  '/sign-in/$': typeof AuthSignInSplatRoute
-  '/sign-up/$': typeof AuthSignUpSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
-  '/_auth/sign-in': typeof AuthSignInRouteRouteWithChildren
-  '/_auth/sign-up': typeof AuthSignUpRouteRouteWithChildren
+  '/_auth/sign-in': typeof AuthSignInRouteRoute
+  '/_auth/sign-up': typeof AuthSignUpRouteRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/settings': typeof AppSettingsRoute
-  '/_auth/sign-in/$': typeof AuthSignInSplatRoute
-  '/_auth/sign-up/$': typeof AuthSignUpSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/sign-in'
-    | '/sign-up'
-    | '/dashboard'
-    | '/settings'
-    | '/sign-in/$'
-    | '/sign-up/$'
+  fullPaths: '/' | '/sign-in' | '/sign-up' | '/dashboard' | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/sign-in'
-    | '/sign-up'
-    | '/dashboard'
-    | '/settings'
-    | '/sign-in/$'
-    | '/sign-up/$'
+  to: '/' | '/sign-in' | '/sign-up' | '/dashboard' | '/settings'
   id:
     | '__root__'
     | '/'
@@ -121,8 +89,6 @@ export interface FileRouteTypes {
     | '/_auth/sign-up'
     | '/_app/dashboard'
     | '/_app/settings'
-    | '/_auth/sign-in/$'
-    | '/_auth/sign-up/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -182,20 +148,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignInRouteRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/sign-up/$': {
-      id: '/_auth/sign-up/$'
-      path: '/$'
-      fullPath: '/sign-up/$'
-      preLoaderRoute: typeof AuthSignUpSplatRouteImport
-      parentRoute: typeof AuthSignUpRouteRoute
-    }
-    '/_auth/sign-in/$': {
-      id: '/_auth/sign-in/$'
-      path: '/$'
-      fullPath: '/sign-in/$'
-      preLoaderRoute: typeof AuthSignInSplatRouteImport
-      parentRoute: typeof AuthSignInRouteRoute
-    }
   }
 }
 
@@ -211,38 +163,14 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
-interface AuthSignInRouteRouteChildren {
-  AuthSignInSplatRoute: typeof AuthSignInSplatRoute
-}
-
-const AuthSignInRouteRouteChildren: AuthSignInRouteRouteChildren = {
-  AuthSignInSplatRoute: AuthSignInSplatRoute,
-}
-
-const AuthSignInRouteRouteWithChildren = AuthSignInRouteRoute._addFileChildren(
-  AuthSignInRouteRouteChildren,
-)
-
-interface AuthSignUpRouteRouteChildren {
-  AuthSignUpSplatRoute: typeof AuthSignUpSplatRoute
-}
-
-const AuthSignUpRouteRouteChildren: AuthSignUpRouteRouteChildren = {
-  AuthSignUpSplatRoute: AuthSignUpSplatRoute,
-}
-
-const AuthSignUpRouteRouteWithChildren = AuthSignUpRouteRoute._addFileChildren(
-  AuthSignUpRouteRouteChildren,
-)
-
 interface AuthRouteChildren {
-  AuthSignInRouteRoute: typeof AuthSignInRouteRouteWithChildren
-  AuthSignUpRouteRoute: typeof AuthSignUpRouteRouteWithChildren
+  AuthSignInRouteRoute: typeof AuthSignInRouteRoute
+  AuthSignUpRouteRoute: typeof AuthSignUpRouteRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
-  AuthSignInRouteRoute: AuthSignInRouteRouteWithChildren,
-  AuthSignUpRouteRoute: AuthSignUpRouteRouteWithChildren,
+  AuthSignInRouteRoute: AuthSignInRouteRoute,
+  AuthSignUpRouteRoute: AuthSignUpRouteRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

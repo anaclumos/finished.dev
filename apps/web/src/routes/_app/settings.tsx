@@ -275,20 +275,17 @@ function PushStatusBanner({
 }
 
 function SettingsPage() {
-  const { data: apiKeysMap } = useLiveQuery((q) =>
-    q.from({ key: apiKeysCollection }).keyBy(({ key }) => key.id)
+  const { data: apiKeysData } = useLiveQuery((q) =>
+    q
+      .from({ key: apiKeysCollection })
+      .orderBy(({ key }) => key.createdAt, 'desc')
   )
-  const apiKeys = apiKeysMap
-    ? Array.from(apiKeysMap.values()).sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      )
-    : undefined
+  const apiKeys = apiKeysData ?? undefined
 
-  const { data: settingsMap } = useLiveQuery((q) =>
-    q.from({ s: userSettingsCollection }).keyBy(() => 'settings')
+  const { data: settingsData } = useLiveQuery((q) =>
+    q.from({ s: userSettingsCollection }).findOne()
   )
-  const settings = settingsMap?.get('settings') ?? {
+  const settings = settingsData ?? {
     pushEnabled: true,
     soundEnabled: true,
   }

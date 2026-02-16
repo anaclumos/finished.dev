@@ -1,5 +1,6 @@
 import { queryCollectionOptions } from '@tanstack/query-db-collection'
 import { createCollection } from '@tanstack/react-db'
+import { getQueryClient } from './query-client'
 
 interface AgentTask {
   id: string
@@ -41,6 +42,7 @@ export const agentTasksCollection = createCollection(
       }
       return res.json() as Promise<AgentTask[]>
     },
+    queryClient: getQueryClient(),
     getKey: (item) => item.id,
   })
 )
@@ -55,6 +57,7 @@ export const apiKeysCollection = createCollection(
       }
       return res.json() as Promise<ApiKey[]>
     },
+    queryClient: getQueryClient(),
     getKey: (item) => item.id,
   })
 )
@@ -67,8 +70,10 @@ export const userSettingsCollection = createCollection(
       if (!res.ok) {
         throw new Error('Failed to fetch settings')
       }
-      return res.json() as Promise<UserSettings>
+      const data = (await res.json()) as UserSettings
+      return [data]
     },
-    getKey: () => 'settings',
+    queryClient: getQueryClient(),
+    getKey: (item) => item.id,
   })
 )

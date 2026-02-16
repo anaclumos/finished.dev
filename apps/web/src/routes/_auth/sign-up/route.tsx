@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { signUp } from '@/lib/auth-client'
 
@@ -7,12 +7,12 @@ export const Route = createFileRoute('/_auth/sign-up')({
 })
 
 function SignUpPage() {
-  const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,7 +22,7 @@ function SignUpPage() {
       await signUp.email(
         { name, email, password },
         {
-          onSuccess: () => navigate({ to: '/dashboard' }),
+          onSuccess: () => setEmailSent(true),
           onError: (ctx) =>
             setError(ctx.error.message || 'Something went wrong'),
         }
@@ -30,6 +30,50 @@ function SignUpPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (emailSent) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="w-full max-w-md rounded-2xl border border-neutral-800 bg-neutral-900 p-8 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-800">
+            <svg
+              className="h-6 w-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <title>Email</title>
+              <path
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <h1 className="mb-2 font-bold text-2xl text-white">
+            Check your email
+          </h1>
+          <p className="mb-6 text-neutral-400 text-sm">
+            We sent a verification link to{' '}
+            <span className="text-white">{email}</span>. Click the link to
+            verify your account.
+          </p>
+          <p className="text-neutral-500 text-xs">
+            Didn't get the email? Check your spam folder or{' '}
+            <button
+              className="text-white hover:underline"
+              onClick={() => setEmailSent(false)}
+              type="button"
+            >
+              try again
+            </button>
+            .
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (

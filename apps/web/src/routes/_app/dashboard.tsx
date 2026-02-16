@@ -288,10 +288,9 @@ function DashboardPage() {
     q
       .from({ task: agentTasksCollection })
       .orderBy(({ task }) => task.createdAt, 'desc')
-      .keyBy(({ task }) => task.id)
   )
 
-  const taskList = tasks ? Array.from(tasks.values()) : []
+  const taskList = tasks ?? []
   const taskCount = taskList.length
 
   const stats = {

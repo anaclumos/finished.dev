@@ -15,7 +15,12 @@ export default defineEventHandler(async (event) => {
 
   const settings = rows[0]
   if (!settings) {
-    return { pushEnabled: true, soundEnabled: true }
+    return {
+      id: 'default',
+      userId: session.user.id,
+      pushEnabled: true,
+      soundEnabled: true,
+    }
   }
 
   return settings

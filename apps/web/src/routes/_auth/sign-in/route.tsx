@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { signIn } from '@/lib/auth-client'
+import { authClient, signIn } from '@/lib/auth-client'
 
 export const Route = createFileRoute('/_auth/sign-in')({
   component: SignInPage,
@@ -12,22 +12,45 @@ function SignInPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [emailNotVerified, setEmailNotVerified] = useState(false)
+  const [resendingVerification, setResendingVerification] = useState(false)
+  const [verificationResent, setVerificationResent] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setEmailNotVerified(false)
+    setVerificationResent(false)
     setLoading(true)
     try {
       await signIn.email(
         { email, password },
         {
           onSuccess: () => navigate({ to: '/dashboard' }),
-          onError: (ctx) =>
-            setError(ctx.error.message || 'Invalid credentials'),
+          onError: (ctx) => {
+            if (ctx.error.message === 'Email not verified') {
+              setEmailNotVerified(true)
+            } else {
+              setError(ctx.error.message || 'Invalid credentials')
+            }
+          },
         }
       )
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleResendVerification = async () => {
+    setResendingVerification(true)
+    try {
+      await authClient.sendVerificationEmail({
+        email,
+        callbackURL: '/dashboard',
+      })
+      setVerificationResent(true)
+    } finally {
+      setResendingVerification(false)
     }
   }
 
@@ -38,6 +61,29 @@ function SignInPage() {
         {error && (
           <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-red-400 text-sm">
             {error}
+          </div>
+        )}
+        {emailNotVerified && (
+          <div className="mb-4 rounded-lg border border-yellow-500/20 bg-yellow-500/10 px-4 py-3 text-sm">
+            <p className="text-yellow-400">
+              Your email hasn't been verified yet.
+            </p>
+            {verificationResent ? (
+              <p className="mt-1 text-yellow-300/70">
+                Verification email sent! Check your inbox.
+              </p>
+            ) : (
+              <button
+                className="mt-1 text-white hover:underline"
+                disabled={resendingVerification}
+                onClick={handleResendVerification}
+                type="button"
+              >
+                {resendingVerification
+                  ? 'Sending...'
+                  : 'Resend verification email'}
+              </button>
+            )}
           </div>
         )}
         <form className="space-y-4" onSubmit={handleSubmit}>

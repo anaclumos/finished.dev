@@ -74,6 +74,10 @@ export const Route = createRootRoute({
     links: [
       {
         rel: 'stylesheet',
+        href: 'https://cdn.jsdelivr.net/gh/anaclumos/sunghyun-sans@v1.0.0/dist/web/css/sunghyun-sans.css',
+      },
+      {
+        rel: 'stylesheet',
         href: appCss,
       },
       {
@@ -92,7 +96,7 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
