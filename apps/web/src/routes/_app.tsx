@@ -1,5 +1,3 @@
-import { UserButton, useUser } from '@clerk/clerk-react'
-import { api } from '@convex/_generated/api'
 import {
   DashboardSquare01Icon,
   Settings01Icon,
@@ -11,8 +9,8 @@ import {
   Outlet,
   useNavigate,
 } from '@tanstack/react-router'
-import { useConvexAuth, useMutation } from 'convex/react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { signOut, useSession } from '@/lib/auth-client'
 import { isPushSupported, subscribeToPush } from '@/lib/push'
 
 export const Route = createFileRoute('/_app')({
@@ -25,16 +23,13 @@ const navigation = [
 ]
 
 function AppLayout() {
-  const { isAuthenticated, isLoading } = useConvexAuth()
-  const { user } = useUser()
+  const { data, isPending } = useSession()
   const navigate = useNavigate()
-  const upsertSubscription = useMutation(
-    api.pushSubscriptions.upsertSubscription
-  )
   const hasSubscribed = useRef(false)
+  const [showMenu, setShowMenu] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated || isLoading || hasSubscribed.current) {
+    if (!data || isPending || hasSubscribed.current) {
       return
     }
 
@@ -51,11 +46,16 @@ function AppLayout() {
         const keys = await subscribeToPush()
         if (keys) {
           hasSubscribed.current = true
-          await upsertSubscription({
-            endpoint: keys.endpoint,
-            p256dh: keys.p256dh,
-            auth: keys.auth,
-            userAgent: navigator.userAgent,
+          await fetch('/api/push-subscriptions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              endpoint: keys.endpoint,
+              p256dh: keys.p256dh,
+              auth: keys.auth,
+              userAgent: navigator.userAgent,
+            }),
+            credentials: 'include',
           })
         }
       } catch (error) {
@@ -64,9 +64,9 @@ function AppLayout() {
     }
 
     setupPush()
-  }, [isAuthenticated, isLoading, upsertSubscription])
+  }, [data, isPending])
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-50">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900" />
@@ -74,7 +74,7 @@ function AppLayout() {
     )
   }
 
-  if (!isAuthenticated) {
+  if (!data) {
     navigate({ to: '/sign-in' })
     return null
   }
@@ -112,19 +112,42 @@ function AppLayout() {
           {/* User section */}
           <div className="border-zinc-200 border-t p-3">
             <div className="flex items-center gap-3 rounded-lg px-3 py-2">
-              <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox: 'h-8 w-8',
-                  },
-                }}
-              />
+              <div className="relative">
+                <button
+                  className="flex items-center gap-2 rounded-full transition-opacity hover:opacity-80"
+                  onClick={() => setShowMenu(!showMenu)}
+                  type="button"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900 font-medium text-sm text-white">
+                    {data?.user?.name?.[0]?.toUpperCase() || '?'}
+                  </div>
+                </button>
+                {showMenu && (
+                  <div className="absolute bottom-full left-0 z-50 mb-2 w-48 rounded-lg border border-zinc-200 bg-white py-1 shadow-lg">
+                    <div className="border-zinc-100 border-b px-3 py-2">
+                      <p className="font-medium text-sm text-zinc-900">
+                        {data?.user?.name}
+                      </p>
+                      <p className="text-xs text-zinc-500">
+                        {data?.user?.email}
+                      </p>
+                    </div>
+                    <button
+                      className="w-full px-3 py-2 text-left text-red-500 text-sm transition-colors hover:bg-zinc-50"
+                      onClick={() => signOut()}
+                      type="button"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
               <div className="flex-1 overflow-hidden">
                 <p className="truncate font-medium text-sm text-zinc-900">
-                  {user?.firstName || user?.emailAddresses[0]?.emailAddress}
+                  {data?.user?.name?.split(' ')[0]}
                 </p>
                 <p className="truncate text-xs text-zinc-500">
-                  {user?.emailAddresses[0]?.emailAddress}
+                  {data?.user?.email}
                 </p>
               </div>
             </div>

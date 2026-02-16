@@ -1,4 +1,4 @@
-import { resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
@@ -10,17 +10,16 @@ import viteTsConfigPaths from 'vite-tsconfig-paths'
 const isVercel = process.env.VERCEL === '1'
 
 const config = defineConfig({
-  resolve: {
-    alias: {
-      '@convex': resolve(__dirname, './convex'),
-    },
-  },
   plugins: [
     devtools(),
     nitro({
       preset: isVercel ? 'vercel' : 'node-server',
       compatibilityDate: 'latest',
       scanDirs: ['server'],
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+        '@server': fileURLToPath(new URL('./server', import.meta.url)),
+      },
     }),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({

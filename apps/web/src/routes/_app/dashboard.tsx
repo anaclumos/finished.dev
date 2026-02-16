@@ -1,4 +1,3 @@
-import { api } from '@convex/_generated/api'
 import {
   Activity01Icon,
   AlertCircleIcon,
@@ -11,9 +10,10 @@ import {
   FlashIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { useLiveQuery } from '@tanstack/react-db'
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from 'convex/react'
 import { Badge } from '@/components/ui/badge'
+import { agentTasksCollection } from '@/lib/collections'
 
 export const Route = createFileRoute('/_app/dashboard')({
   component: DashboardPage,
@@ -163,12 +163,12 @@ function TaskRow({
   task,
 }: {
   task: {
-    _id: string
+    id: string
     title: string
     status: string
-    createdAt: number
+    createdAt: string | number | Date
     source?: string
-    duration?: number
+    duration?: number | null
   }
 }) {
   const config =
@@ -188,7 +188,7 @@ function TaskRow({
           {task.title}
         </p>
         <div className="mt-1 flex items-center gap-2 text-sm text-zinc-500">
-          <span>{formatRelativeTime(task.createdAt)}</span>
+          <span>{formatRelativeTime(new Date(task.createdAt).getTime())}</span>
           {task.source && (
             <>
               <span className="text-zinc-300">·</span>
@@ -284,16 +284,25 @@ function LoadingState() {
 }
 
 function DashboardPage() {
-  const tasks = useQuery(api.agentTasks.list, { limit: 50 })
-  const taskCount = useQuery(api.agentTasks.count, {})
+  const { data: tasks } = useLiveQuery((q) =>
+    q
+      .from({ task: agentTasksCollection })
+      .orderBy(({ task }) => task.createdAt, 'desc')
+      .keyBy(({ task }) => task.id)
+  )
+
+  const taskList = tasks ? Array.from(tasks.values()) : []
+  const taskCount = taskList.length
 
   const stats = {
-    total: taskCount ?? 0,
+    total: taskCount,
     today:
-      tasks?.filter((t) => t.createdAt > Date.now() - 24 * 60 * 60 * 1000)
-        .length ?? 0,
-    success: tasks?.filter((t) => t.status === 'success').length ?? 0,
-    failed: tasks?.filter((t) => t.status === 'failure').length ?? 0,
+      taskList.filter(
+        (t) =>
+          new Date(t.createdAt).getTime() > Date.now() - 24 * 60 * 60 * 1000
+      ).length ?? 0,
+    success: taskList.filter((t) => t.status === 'success').length,
+    failed: taskList.filter((t) => t.status === 'failure').length,
   }
 
   const successRate =
@@ -385,13 +394,13 @@ function DashboardPage() {
               <h2 className="font-semibold text-lg text-zinc-900">
                 Recent Tasks
               </h2>
-              {tasks && tasks.length > 0 && (
+              {taskList.length > 0 && (
                 <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 font-medium text-xs text-zinc-600">
-                  {tasks.length}
+                  {taskList.length}
                 </span>
               )}
             </div>
-            {tasks && tasks.length > 0 && (
+            {taskList.length > 0 && (
               <div className="flex items-center gap-1.5">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
@@ -407,13 +416,13 @@ function DashboardPage() {
               if (tasks === undefined) {
                 return <LoadingState />
               }
-              if (tasks.length === 0) {
+              if (taskList.length === 0) {
                 return <EmptyState />
               }
               return (
                 <div className="max-h-[600px] overflow-y-auto">
-                  {tasks.map((task) => (
-                    <TaskRow key={task._id} task={task} />
+                  {taskList.map((task) => (
+                    <TaskRow key={task.id} task={task} />
                   ))}
                 </div>
               )

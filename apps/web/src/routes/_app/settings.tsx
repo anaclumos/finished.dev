@@ -1,5 +1,3 @@
-import { api } from '@convex/_generated/api'
-import type { Id } from '@convex/_generated/dataModel'
 import {
   AlertCircleIcon,
   Cancel01Icon,
@@ -16,11 +14,12 @@ import {
   VolumeHighIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { useLiveQuery } from '@tanstack/react-db'
 import { createFileRoute } from '@tanstack/react-router'
-import { useAction, useMutation, useQuery } from 'convex/react'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { apiKeysCollection, userSettingsCollection } from '@/lib/collections'
 import {
   getPermissionStatus,
   isPushSupported,
@@ -83,11 +82,11 @@ function ToggleSwitch({
 }
 
 interface ApiKey {
-  _id: Id<'apiKeys'>
+  id: string
   name: string
   keyPrefix: string
-  createdAt: number
-  lastUsedAt?: number
+  createdAt: string | number | Date
+  lastUsedAt?: string | number | Date | null
 }
 
 function ApiKeysList({
@@ -96,8 +95,8 @@ function ApiKeysList({
   onDeleteKey,
 }: {
   apiKeys: ApiKey[] | undefined
-  formatDate: (timestamp: number) => string
-  onDeleteKey: (id: Id<'apiKeys'>) => void
+  formatDate: (timestamp: string | number | Date) => string
+  onDeleteKey: (id: string) => void
 }) {
   if (apiKeys === undefined) {
     return (
@@ -130,7 +129,7 @@ function ApiKeysList({
       {apiKeys.map((key) => (
         <div
           className="group flex items-center justify-between py-4 first:pt-0 last:pb-0"
-          key={key._id}
+          key={key.id}
         >
           <div className="min-w-0 flex-1">
             <p className="font-medium text-zinc-900">{key.name}</p>
@@ -152,7 +151,7 @@ function ApiKeysList({
           </div>
           <Button
             className="ml-4 text-zinc-500/70 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
-            onClick={() => onDeleteKey(key._id)}
+            onClick={() => onDeleteKey(key.id)}
             size="sm"
             variant="ghost"
           >
@@ -276,15 +275,23 @@ function PushStatusBanner({
 }
 
 function SettingsPage() {
-  const apiKeys = useQuery(api.apiKeys.list, {})
-  const createApiKey = useMutation(api.apiKeys.create)
-  const deleteApiKey = useMutation(api.apiKeys.remove)
-  const settings = useQuery(api.userSettings.get, {})
-  const updateSettings = useMutation(api.userSettings.update)
-  const upsertSubscription = useMutation(
-    api.pushSubscriptions.upsertSubscription
+  const { data: apiKeysMap } = useLiveQuery((q) =>
+    q.from({ key: apiKeysCollection }).keyBy(({ key }) => key.id)
   )
-  const sendTestNotification = useAction(api.notifications.sendTestNotification)
+  const apiKeys = apiKeysMap
+    ? Array.from(apiKeysMap.values()).sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
+    : undefined
+
+  const { data: settingsMap } = useLiveQuery((q) =>
+    q.from({ s: userSettingsCollection }).keyBy(() => 'settings')
+  )
+  const settings = settingsMap?.get('settings') ?? {
+    pushEnabled: true,
+    soundEnabled: true,
+  }
 
   const [keyName, setKeyName] = useState('')
   const [creating, setCreating] = useState(false)
@@ -338,7 +345,7 @@ function SettingsPage() {
 
       const keys = await subscribeToPush()
       if (keys) {
-        await upsertSubscription({
+        await handleUpsertSubscription({
           endpoint: keys.endpoint,
           p256dh: keys.p256dh,
           auth: keys.auth,
@@ -361,7 +368,17 @@ function SettingsPage() {
     setTestNotificationMessage(null)
 
     try {
-      const result = await sendTestNotification({})
+      const res = await fetch('/api/notifications/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+        credentials: 'include',
+      })
+      if (!res.ok) {
+        throw new Error('Failed to send test notification.')
+      }
+
+      const result = (await res.json()) as { sent: number; message?: string }
 
       if (result.sent > 0) {
         setTestNotificationStatus('success')
@@ -369,8 +386,7 @@ function SettingsPage() {
       } else {
         setTestNotificationStatus('error')
         setTestNotificationMessage(
-          result.message ??
-            'No push subscriptions found. Enable notifications and try again.'
+          result.message ?? 'No push subscriptions found.'
         )
       }
     } catch (error) {
@@ -391,9 +407,20 @@ function SettingsPage() {
 
     setCreating(true)
     try {
-      const result = await createApiKey({ name: keyName.trim() })
+      const res = await fetch('/api/api-keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: keyName.trim() }),
+        credentials: 'include',
+      })
+      if (!res.ok) {
+        throw new Error('Failed to create API key.')
+      }
+
+      const result = (await res.json()) as { key: string }
       setNewKey(result.key)
       setKeyName('')
+      apiKeysCollection.invalidate()
     } catch (error) {
       console.error('Failed to create API key:', error)
     } finally {
@@ -410,7 +437,7 @@ function SettingsPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleDeleteKey = async (id: Id<'apiKeys'>) => {
+  const handleDeleteKey = async (id: string) => {
     const confirmed = globalThis.confirm(
       'Are you sure you want to delete this API key? This cannot be undone.'
     )
@@ -418,13 +445,57 @@ function SettingsPage() {
       return
     }
     try {
-      await deleteApiKey({ id })
+      const res = await fetch(`/api/api-keys/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      if (!res.ok) {
+        throw new Error('Failed to delete API key.')
+      }
+      apiKeysCollection.invalidate()
     } catch (error) {
       console.error('Failed to delete API key:', error)
     }
   }
 
-  const formatDate = (timestamp: number) => {
+  const handleUpdateSettings = async (update: {
+    pushEnabled?: boolean
+    soundEnabled?: boolean
+  }) => {
+    try {
+      const res = await fetch('/api/user-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(update),
+        credentials: 'include',
+      })
+      if (!res.ok) {
+        throw new Error('Failed to update settings.')
+      }
+      userSettingsCollection.invalidate()
+    } catch (error) {
+      console.error('Failed to update settings:', error)
+    }
+  }
+
+  const handleUpsertSubscription = async (keys: {
+    endpoint: string
+    p256dh: string
+    auth: string
+    userAgent?: string
+  }) => {
+    const res = await fetch('/api/push-subscriptions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(keys),
+      credentials: 'include',
+    })
+    if (!res.ok) {
+      throw new Error('Failed to subscribe for push notifications.')
+    }
+  }
+
+  const formatDate = (timestamp: string | number | Date) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -599,7 +670,7 @@ function SettingsPage() {
                       checked={settings?.pushEnabled ?? true}
                       disabled={pushStatus !== 'granted'}
                       onChange={(checked) =>
-                        updateSettings({ pushEnabled: checked })
+                        handleUpdateSettings({ pushEnabled: checked })
                       }
                     />
                   </div>
@@ -623,7 +694,7 @@ function SettingsPage() {
                     <ToggleSwitch
                       checked={settings?.soundEnabled ?? true}
                       onChange={(checked) =>
-                        updateSettings({ soundEnabled: checked })
+                        handleUpdateSettings({ soundEnabled: checked })
                       }
                     />
                   </div>

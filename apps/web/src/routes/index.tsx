@@ -1,10 +1,4 @@
 import {
-  ClerkLoaded,
-  ClerkLoading,
-  SignedIn,
-  SignedOut,
-} from '@clerk/clerk-react'
-import {
   CheckmarkCircle02Icon,
   Clock01Icon,
   CloudIcon,
@@ -17,6 +11,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { CodeBlock, InlineCode } from '@/components/code-block'
 import { Button } from '@/components/ui/button'
+import { useSession } from '@/lib/auth-client'
 
 export const Route = createFileRoute('/')({ component: LandingPage })
 
@@ -73,6 +68,7 @@ finished ping "Tests passed" --status success
 finished ping "Build failed" --status failure`
 
 function LandingPage() {
+  const { data: session, isPending } = useSession()
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
@@ -90,35 +86,27 @@ function LandingPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <ClerkLoading>
+            {isPending && (
               <Link
                 className="font-medium text-sm text-zinc-600 hover:text-zinc-900"
                 to="/sign-in"
               >
                 Sign In
               </Link>
-              <Link to="/waitlist">
-                <Button size="sm">Join the Waitlist</Button>
+            )}
+            {!(isPending || session) && (
+              <Link
+                className="font-medium text-sm text-zinc-600 hover:text-zinc-900"
+                to="/sign-in"
+              >
+                Sign In
               </Link>
-            </ClerkLoading>
-            <ClerkLoaded>
-              <SignedOut>
-                <Link
-                  className="font-medium text-sm text-zinc-600 hover:text-zinc-900"
-                  to="/sign-in"
-                >
-                  Sign In
-                </Link>
-                <Link to="/waitlist">
-                  <Button size="sm">Join the Waitlist</Button>
-                </Link>
-              </SignedOut>
-              <SignedIn>
-                <Link to="/dashboard">
-                  <Button size="sm">Open Dashboard</Button>
-                </Link>
-              </SignedIn>
-            </ClerkLoaded>
+            )}
+            {!isPending && session && (
+              <Link to="/dashboard">
+                <Button size="sm">Open Dashboard</Button>
+              </Link>
+            )}
           </div>
         </nav>
       </header>
@@ -148,23 +136,21 @@ function LandingPage() {
             </p>
 
             <div className="mt-10 flex items-center justify-center gap-4">
-              <ClerkLoading>
-                <Link to="/waitlist">
-                  <Button size="lg">Join the Waitlist</Button>
+              {isPending && (
+                <Link to="/sign-up">
+                  <Button size="lg">Get Started</Button>
                 </Link>
-              </ClerkLoading>
-              <ClerkLoaded>
-                <SignedOut>
-                  <Link to="/waitlist">
-                    <Button size="lg">Join the Waitlist</Button>
-                  </Link>
-                </SignedOut>
-                <SignedIn>
-                  <Link to="/dashboard">
-                    <Button size="lg">Open Dashboard</Button>
-                  </Link>
-                </SignedIn>
-              </ClerkLoaded>
+              )}
+              {!(isPending || session) && (
+                <Link to="/sign-up">
+                  <Button size="lg">Get Started</Button>
+                </Link>
+              )}
+              {!isPending && session && (
+                <Link to="/dashboard">
+                  <Button size="lg">Open Dashboard</Button>
+                </Link>
+              )}
             </div>
 
             {/* CLI Preview */}
@@ -298,18 +284,16 @@ function LandingPage() {
               </div>
 
               <div className="mt-10">
-                <ClerkLoading>
-                  <Link to="/waitlist">
-                    <Button>Join the Waitlist</Button>
+                {isPending && (
+                  <Link to="/sign-up">
+                    <Button>Get Started</Button>
                   </Link>
-                </ClerkLoading>
-                <ClerkLoaded>
-                  <SignedOut>
-                    <Link to="/waitlist">
-                      <Button>Join the Waitlist</Button>
-                    </Link>
-                  </SignedOut>
-                </ClerkLoaded>
+                )}
+                {!(isPending || session) && (
+                  <Link to="/sign-up">
+                    <Button>Get Started</Button>
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -389,38 +373,36 @@ function LandingPage() {
             Completes. No Credit Card Required.
           </p>
           <div className="mt-10">
-            <ClerkLoading>
-              <Link to="/waitlist">
+            {isPending && (
+              <Link to="/sign-up">
                 <Button
                   className="bg-white text-zinc-900 hover:bg-zinc-100"
                   size="lg"
                 >
-                  Join the Waitlist
+                  Get Started
                 </Button>
               </Link>
-            </ClerkLoading>
-            <ClerkLoaded>
-              <SignedOut>
-                <Link to="/waitlist">
-                  <Button
-                    className="bg-white text-zinc-900 hover:bg-zinc-100"
-                    size="lg"
-                  >
-                    Join the Waitlist
-                  </Button>
-                </Link>
-              </SignedOut>
-              <SignedIn>
-                <Link to="/dashboard">
-                  <Button
-                    className="bg-white text-zinc-900 hover:bg-zinc-100"
-                    size="lg"
-                  >
-                    Open Dashboard
-                  </Button>
-                </Link>
-              </SignedIn>
-            </ClerkLoaded>
+            )}
+            {!(isPending || session) && (
+              <Link to="/sign-up">
+                <Button
+                  className="bg-white text-zinc-900 hover:bg-zinc-100"
+                  size="lg"
+                >
+                  Get Started
+                </Button>
+              </Link>
+            )}
+            {!isPending && session && (
+              <Link to="/dashboard">
+                <Button
+                  className="bg-white text-zinc-900 hover:bg-zinc-100"
+                  size="lg"
+                >
+                  Open Dashboard
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </section>

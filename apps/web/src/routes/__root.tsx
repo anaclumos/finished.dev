@@ -2,7 +2,7 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { Analytics } from '@vercel/analytics/react'
-import { ConvexClerkProvider } from '../providers/convex-clerk-provider'
+import { AuthProvider } from '../providers/auth-provider'
 
 import appCss from '../styles.css?url'
 
@@ -97,7 +97,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <ConvexClerkProvider>{children}</ConvexClerkProvider>
+        <AuthProvider>{children}</AuthProvider>
         <Analytics />
         <TanStackDevtools
           config={{
