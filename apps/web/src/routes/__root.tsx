@@ -99,6 +99,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script
+          data-token="0b61cecc-d371-48b8-8546-7623b1116fb4"
+          src="https://cdn.visitors.now/v.js"
+        />
       </head>
       <body>
         <Providers>{children}</Providers>
