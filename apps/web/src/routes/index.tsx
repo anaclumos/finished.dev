@@ -149,8 +149,7 @@ function LandingPage() {
             </h1>
 
             <p className="mt-6 text-lg text-zinc-600 leading-relaxed">
-              Get Phone Push Notifications the Moment Your Agents, Builds, or
-              Background Tasks Complete. One CLI Command, Zero Friction.
+              Get Phone Push Notifications the Moment Your Agents Complete.
             </p>
 
             <div className="mt-10 flex items-center justify-center gap-4">
