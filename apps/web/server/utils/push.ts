@@ -10,17 +10,17 @@ export function ensureVapidConfigured() {
     return true
   }
 
-  const vapidEmail = process.env.WEB_PUSH_EMAIL
+  const vapidSubject = process.env.WEB_PUSH_SUBJECT
   const vapidPublicKey = process.env.VITE_WEB_PUSH_PUBLIC_KEY
   const vapidPrivateKey = process.env.WEB_PUSH_PRIVATE_KEY
 
-  if (!(vapidEmail && vapidPublicKey && vapidPrivateKey)) {
+  if (!(vapidSubject && vapidPublicKey && vapidPrivateKey)) {
     return false
   }
 
-  const subject = vapidEmail.startsWith('mailto:')
-    ? vapidEmail
-    : `mailto:${vapidEmail}`
+  const subject = vapidSubject.startsWith('mailto:')
+    ? vapidSubject
+    : `mailto:${vapidSubject}`
 
   webpush.setVapidDetails(subject, vapidPublicKey, vapidPrivateKey)
   vapidConfigured = true

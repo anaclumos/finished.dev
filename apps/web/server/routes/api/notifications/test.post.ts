@@ -39,7 +39,8 @@ export default defineEventHandler(async (event) => {
   if (!ensureVapidConfigured()) {
     throw createError({
       statusCode: 500,
-      statusMessage: 'Web Push is not configured',
+      statusMessage:
+        'Web Push is not configured. Check WEB_PUSH_SUBJECT, VITE_WEB_PUSH_PUBLIC_KEY, and WEB_PUSH_PRIVATE_KEY env vars.',
     })
   }
 

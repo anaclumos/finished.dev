@@ -370,7 +370,11 @@ function useSettings() {
         credentials: 'include',
       })
       if (!res.ok) {
-        throw new Error('Failed to send test notification.')
+        const errorBody = await res.json().catch(() => null)
+        throw new Error(
+          (errorBody as { statusMessage?: string })?.statusMessage ??
+            `Failed to send test notification (${res.status}).`
+        )
       }
 
       const result = (await res.json()) as { sent: number; message?: string }
