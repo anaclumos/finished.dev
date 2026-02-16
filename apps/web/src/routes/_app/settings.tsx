@@ -842,7 +842,7 @@ function SettingsPage() {
                     <p className="text-zinc-500"># Send a notification</p>
                     <p className="text-zinc-100">
                       <span className="text-emerald-400">$</span> finished ping
-                      'Task completed!'
+                      'Task completed'
                     </p>
                   </div>
                 </div>
