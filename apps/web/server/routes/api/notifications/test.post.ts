@@ -1,8 +1,10 @@
 import { requireAuth } from '@server/utils/auth'
-import { ensureVapidConfigured } from '@server/utils/push'
+import {
+  ensureVapidConfigured,
+  sendPushToSubscriptions,
+} from '@server/utils/push'
 import { eq } from 'drizzle-orm'
 import { createError, defineEventHandler, readBody } from 'h3'
-import webpush from 'web-push'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import { pushSubscriptions } from '@/lib/schema'
@@ -27,15 +29,6 @@ export default defineEventHandler(async (event) => {
 
   const body = parsed.data
 
-  const subscriptions = await db
-    .select()
-    .from(pushSubscriptions)
-    .where(eq(pushSubscriptions.userId, session.user.id))
-
-  if (subscriptions.length === 0) {
-    return { success: true, sent: 0 }
-  }
-
   if (!ensureVapidConfigured()) {
     throw createError({
       statusCode: 500,
@@ -44,28 +37,39 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const subscriptions = await db
+    .select()
+    .from(pushSubscriptions)
+    .where(eq(pushSubscriptions.userId, session.user.id))
+
+  if (subscriptions.length === 0) {
+    return {
+      success: false,
+      sent: 0,
+      message:
+        'No push subscriptions found. Enable notifications in your browser first.',
+    }
+  }
+
   const payload = JSON.stringify({
     title: body.title ?? 'Test notification',
     body: body.body ?? 'This is a test notification from finished.dev',
     url: body.url ?? '/dashboard',
   })
 
-  const results = await Promise.allSettled(
-    subscriptions.map((subscription) =>
-      webpush.sendNotification(
-        {
-          endpoint: subscription.endpoint,
-          keys: {
-            p256dh: subscription.p256dh,
-            auth: subscription.auth,
-          },
-        },
-        payload
-      )
-    )
-  )
+  const result = await sendPushToSubscriptions(subscriptions, payload)
 
-  const sent = results.filter((result) => result.status === 'fulfilled').length
+  if (result.sent === 0) {
+    const staleNote =
+      result.staleIds.length > 0
+        ? ` ${result.staleIds.length} expired subscription(s) were removed.`
+        : ''
+    return {
+      success: false,
+      sent: 0,
+      message: `Push delivery failed: ${result.errors[0] ?? 'Unknown error'}.${staleNote} Re-enable notifications to create a fresh subscription.`,
+    }
+  }
 
-  return { success: true, sent }
+  return { success: true, sent: result.sent }
 })

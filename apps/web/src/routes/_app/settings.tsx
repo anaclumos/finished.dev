@@ -377,7 +377,11 @@ function useSettings() {
         )
       }
 
-      const result = (await res.json()) as { sent: number; message?: string }
+      const result = (await res.json()) as {
+        success: boolean
+        sent: number
+        message?: string
+      }
 
       if (result.sent > 0) {
         setTestNotificationStatus('success')
@@ -385,7 +389,7 @@ function useSettings() {
       } else {
         setTestNotificationStatus('error')
         setTestNotificationMessage(
-          result.message ?? 'No push subscriptions found.'
+          result.message ?? 'Failed to send test notification.'
         )
       }
     } catch (error) {
