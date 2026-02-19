@@ -144,29 +144,6 @@ export const agentTasks = finished.table(
   })
 )
 
-export const pushSubscriptions = finished.table(
-  'pushSubscriptions',
-  {
-    id: text('id')
-      .primaryKey()
-      .$defaultFn(() => ulid()),
-    userId: text('userId')
-      .notNull()
-      .references(() => user.id),
-    endpoint: text('endpoint').notNull(),
-    p256dh: text('p256dh').notNull(),
-    auth: text('auth').notNull(),
-    userAgent: text('userAgent'),
-    createdAt: timestamp('createdAt', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (table) => ({
-    userIdIdx: index('push_subscriptions_user_id_idx').on(table.userId),
-    endpointIdx: index('push_subscriptions_endpoint_idx').on(table.endpoint),
-  })
-)
-
 export const userSettings = finished.table(
   'userSettings',
   {
@@ -191,6 +168,31 @@ export const userSettings = finished.table(
   })
 )
 
+export const pushSubscriptions = finished.table(
+  'pushSubscriptions',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => ulid()),
+    userId: text('userId')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    endpoint: text('endpoint').notNull(),
+    p256dh: text('p256dh').notNull(),
+    auth: text('auth').notNull(),
+    createdAt: timestamp('createdAt', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updatedAt', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    userIdIdx: index('push_subscriptions_user_id_idx').on(table.userId),
+    endpointIdx: index('push_subscriptions_endpoint_idx').on(table.endpoint),
+  })
+)
+
 export const schema = {
   user,
   session,
@@ -198,8 +200,8 @@ export const schema = {
   verification,
   apiKeys,
   agentTasks,
-  pushSubscriptions,
   userSettings,
+  pushSubscriptions,
 }
 
 export type InsertApiKey = typeof apiKeys.$inferInsert
@@ -208,8 +210,8 @@ export type SelectApiKey = typeof apiKeys.$inferSelect
 export type InsertAgentTask = typeof agentTasks.$inferInsert
 export type SelectAgentTask = typeof agentTasks.$inferSelect
 
-export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert
-export type SelectPushSubscription = typeof pushSubscriptions.$inferSelect
-
 export type InsertUserSettings = typeof userSettings.$inferInsert
 export type SelectUserSettings = typeof userSettings.$inferSelect
+
+export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert
+export type SelectPushSubscription = typeof pushSubscriptions.$inferSelect

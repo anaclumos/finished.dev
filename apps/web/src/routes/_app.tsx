@@ -53,7 +53,6 @@ function AppLayout() {
               endpoint: keys.endpoint,
               p256dh: keys.p256dh,
               auth: keys.auth,
-              userAgent: navigator.userAgent,
             }),
             credentials: 'include',
           })

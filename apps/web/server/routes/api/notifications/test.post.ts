@@ -1,7 +1,8 @@
 import { requireAuth } from '@server/utils/auth'
 import {
+  clearPushSubscription,
   ensureVapidConfigured,
-  sendPushToSubscriptions,
+  sendPush,
 } from '@server/utils/push'
 import { eq } from 'drizzle-orm'
 import { createError, defineEventHandler, readBody } from 'h3'
@@ -37,17 +38,19 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const subscriptions = await db
+  const rows = await db
     .select()
     .from(pushSubscriptions)
     .where(eq(pushSubscriptions.userId, session.user.id))
+    .limit(1)
 
-  if (subscriptions.length === 0) {
+  const sub = rows[0]
+  if (!sub) {
     return {
       success: false,
       sent: 0,
       message:
-        'No push subscriptions found. Enable notifications in your browser first.',
+        'No push subscription found. Enable notifications in your browser first.',
     }
   }
 
@@ -57,19 +60,28 @@ export default defineEventHandler(async (event) => {
     url: body.url ?? '/dashboard',
   })
 
-  const result = await sendPushToSubscriptions(subscriptions, payload)
+  const result = await sendPush(
+    { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
+    payload
+  )
 
-  if (result.sent === 0) {
-    const staleNote =
-      result.staleIds.length > 0
-        ? ` ${result.staleIds.length} expired subscription(s) were removed.`
-        : ''
+  if (result.stale) {
+    await clearPushSubscription(session.user.id)
     return {
       success: false,
       sent: 0,
-      message: `Push delivery failed: ${result.errors[0] ?? 'Unknown error'}.${staleNote} Re-enable notifications to create a fresh subscription.`,
+      message:
+        'Push subscription expired. Re-enable notifications to create a fresh subscription.',
     }
   }
 
-  return { success: true, sent: result.sent }
+  if (!result.success) {
+    return {
+      success: false,
+      sent: 0,
+      message: `Push delivery failed: ${result.error}.`,
+    }
+  }
+
+  return { success: true, sent: 1 }
 })

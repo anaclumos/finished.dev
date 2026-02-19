@@ -1,15 +1,3 @@
-/**
- * Web Push notification utilities for finished.dev
- *
- * Uses subscription.toJSON() for key extraction (base64url encoding)
- * matching the format expected by the web-push library.
- */
-
-const SW_PATH = '/sw.js'
-
-/**
- * Check if push notifications are supported
- */
 export function isPushSupported(): boolean {
   if (typeof window === 'undefined') {
     return false
@@ -22,9 +10,6 @@ export function isPushSupported(): boolean {
   )
 }
 
-/**
- * Get the current notification permission status
- */
 export function getPermissionStatus(): NotificationPermission {
   if (!isPushSupported()) {
     return 'denied'
@@ -32,63 +17,17 @@ export function getPermissionStatus(): NotificationPermission {
   return Notification.permission
 }
 
-/**
- * Convert a URL-safe base64 string to a Uint8Array
- */
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
-
   const rawData = window.atob(base64)
   const outputArray = new Uint8Array(rawData.length)
-
   for (let i = 0; i < rawData.length; ++i) {
     outputArray[i] = rawData.charCodeAt(i)
   }
-
   return outputArray
 }
 
-/**
- * Register the service worker
- */
-export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
-  if (!('serviceWorker' in navigator)) {
-    return null
-  }
-
-  try {
-    return await navigator.serviceWorker.register(SW_PATH)
-  } catch {
-    return null
-  }
-}
-
-/**
- * Extract keys from a PushSubscription via toJSON() (base64url encoding
- * matching web-push library expectations).
- */
-function extractKeys(subscription: PushSubscription): {
-  endpoint: string
-  p256dh: string
-  auth: string
-} | null {
-  const json = subscription.toJSON()
-  if (json.endpoint && json.keys) {
-    return {
-      endpoint: json.endpoint,
-      p256dh: json.keys.p256dh ?? '',
-      auth: json.keys.auth ?? '',
-    }
-  }
-  return null
-}
-
-/**
- * Subscribe to push notifications.
- * Reuses existing browser subscription if available, otherwise creates new.
- * Returns keys via toJSON() (base64url).
- */
 export async function subscribeToPush(): Promise<{
   endpoint: string
   p256dh: string
@@ -96,22 +35,17 @@ export async function subscribeToPush(): Promise<{
 } | null> {
   const publicKey = import.meta.env.VITE_WEB_PUSH_PUBLIC_KEY
   if (!publicKey) {
-    console.error('[Push] VAPID public key not configured')
     return null
   }
 
-  const registration = await registerServiceWorker()
-  if (!registration) {
-    return null
-  }
-
+  const registration = await navigator.serviceWorker.register('/sw.js')
   await navigator.serviceWorker.ready
 
   try {
-    // Reuse existing subscription if available (prevents invalidating stored endpoints)
+    // Always unsubscribe first — never reuse stale subscriptions
     const existing = await registration.pushManager.getSubscription()
     if (existing) {
-      return extractKeys(existing)
+      await existing.unsubscribe()
     }
 
     const subscription = await registration.pushManager.subscribe({
@@ -119,34 +53,16 @@ export async function subscribeToPush(): Promise<{
       applicationServerKey: urlBase64ToUint8Array(publicKey) as BufferSource,
     })
 
-    return extractKeys(subscription)
-  } catch (error) {
-    console.error('[Push] Failed to subscribe:', error)
-    return null
-  }
-}
-
-/**
- * Unsubscribe from push notifications
- */
-export async function unsubscribeFromPush(): Promise<boolean> {
-  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
-    return false
-  }
-
-  try {
-    const registration = await navigator.serviceWorker.getRegistration()
-    if (registration) {
-      const subscription = await registration.pushManager.getSubscription()
-      if (subscription) {
-        await subscription.unsubscribe()
-        return true
-      }
+    const json = subscription.toJSON()
+    if (!(json.endpoint && json.keys)) {
+      return null
     }
-
-    return false
-  } catch (error) {
-    console.error('[Push] Failed to unsubscribe:', error)
-    return false
+    return {
+      endpoint: json.endpoint,
+      p256dh: json.keys.p256dh ?? '',
+      auth: json.keys.auth ?? '',
+    }
+  } catch {
+    return null
   }
 }

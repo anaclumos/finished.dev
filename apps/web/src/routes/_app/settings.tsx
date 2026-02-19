@@ -344,7 +344,6 @@ function useSettings() {
           endpoint: keys.endpoint,
           p256dh: keys.p256dh,
           auth: keys.auth,
-          userAgent: navigator.userAgent,
         })
         setPushStatus('granted')
       } else {
@@ -490,7 +489,6 @@ function useSettings() {
     endpoint: string
     p256dh: string
     auth: string
-    userAgent?: string
   }) => {
     const res = await fetch('/api/push-subscriptions', {
       method: 'POST',
